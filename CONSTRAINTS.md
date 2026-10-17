@@ -41,6 +41,8 @@ Enforced by `dart run tool/floor_guard.dart` (exit 1 = blocked).
 | Market data | Every seed offer points at a real marketplace host, never `example.invalid` | `flutter test test/seed_data_test.dart` | every edit |
 | Market data | Every referenced image file exists and is a real JPEG or PNG | `flutter test test/seed_data_test.dart` | every edit |
 | Market data | No seed URL is dead | `dart run tool/verify_links.dart` | before every demo |
+| Data layer | No raw exception reaches a screen; every failure is a `DataFailure` | `flutter test test/data_contract_test.dart` | every edit |
+| Data layer | Untrusted documents are validated at the parse boundary | `flutter test test/data_contract_test.dart` | every edit |
 
 **Why these numbers**
 
@@ -73,12 +75,18 @@ Enforced by `dart run tool/floor_guard.dart` (exit 1 = blocked).
 
 Recorded so a regression is visible. Not a gate.
 
-| Metric | Today | Direction |
-|--------|-------|-----------|
-| Total line coverage (`lib/`) | 86.8% (1047/1206) | must not fall |
-| Asset payload | 1805 KB | must not grow |
-| Seed products with 3 verified stores | 3 of 5 | must not fall |
-| Placeholder product records | 0 | must stay 0 |
+The direction word sits directly after the value on purpose: `tool/floor_guard.dart`
+reads a number's polarity from the words immediately around it, so a ratchet
+written this way is actually checked. With the direction parked in a distant
+column the guard cannot tell raising a ratchet from lowering one, and reports
+every edit as `threshold-changed`.
+
+| Metric | Today | | Detail |
+|--------|-------|---|--------|
+| Total line coverage, lib/ | 88.4% must not fall | | 1178 of 1333 lines |
+| Asset payload | 1805 KB must not grow | | bundled fonts and images |
+| Seed products on 3 verified stores | 3 must not fall | | of 5 |
+| Placeholder product records | 0 must not grow | | example.invalid hosts |
 
 **Why recorded rather than gated.** A ratchet asks for no negotiation: record
 where you are, then refuse to get worse. Each of these already has a hard
@@ -93,13 +101,19 @@ why `MissingImage` remains a legitimate answer rather than a failure.
 
 ## Exceptions
 
-None. If a constraint needs an exception, add a row here with an owner and an
-expiry date — do not delete the rule. Deleting it unblocks everyone forever;
-an exception unblocks one case until a date.
+None active. If a constraint needs an exception, add a row here with an owner
+and an expiry date — do not delete the rule. Deleting it unblocks everyone
+forever; an exception unblocks one case until a date.
 
 | ID | Rule | Path | Reason | Owner | Expires |
 |----|------|------|--------|-------|---------|
 | — | — | — | — | — | — |
+
+**Known limitation:** `tool/floor_guard.dart` does not parse this table. It
+reports every threshold edit and every new row, and a human decides. That is
+deliberate for a first-run guard, but it means a legitimate reformat looks the
+same as an attempt to lower the bar. When that happens, the resolution is a row
+here with a date, not silence and not deleting the rule.
 
 ---
 

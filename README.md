@@ -22,9 +22,9 @@ the confirmation restates the recorded price and its date.
 | Design system | Complete — tokens in `lib/theme/`, Inter bundled in `assets/fonts/` |
 | Screens | Home, Product Details (comparison hero), Search Results complete |
 | Catalog | 5 hand-curated products, real marketplace links, bundled images |
-| Favorites / Account | Honest empty states. Not built. |
-| Firebase | Not wired. The repository interface exists so it can be. |
-| Tests | 51 across 6 files |
+| Favorites / Account | Contracts defined; UI not built. Not built. |
+| Firebase | Not wired. The repository interfaces exist so it can be. |
+| Tests | 86 across 7 files |
 | Quality gates | `CONSTRAINTS.md`, enforced by `tool/check.ps1` |
 
 ## Data honesty
@@ -62,15 +62,28 @@ which command, and why that number. `tool/floor_guard.dart` watches the diff for
 the five moves that quietly lower a standard — a skipped test, a deleted
 assertion, a suppression comment, unfinished work, or a threshold edit.
 
-Current coverage: **86.8%** of `lib/`, floor 80%.
+Current coverage: **88.4%** of `lib/`, floor 80%.
 
 ## Architecture
 
 Screens depend on providers; providers depend on repository interfaces; no
-screen imports data directly. `ProductRepository` is the seam that lets the
-seed dataset be replaced by a Firestore stream without touching UI code. The
-same seam is the intended shape for `FavoritesRepository` and `AuthService`
-when they are built.
+screen imports data directly. The data layer is `lib/data/`, and it holds three
+swapped boundaries:
+
+| Boundary | Shape | Today | Later |
+|---|---|---|---|
+| `ProductRepository` | `Stream<List<Product>>` | seed dataset | Firestore |
+| `FavoritesRepository` | stream + idempotent `toggle` + sync state | contract only | Firestore |
+| `AuthService` | user-or-guest + non-enumerating reset | contract only | Firebase Auth |
+
+`ProductRepository` is a stream rather than a future on purpose: Firestore hands
+you a stream, and declaring a future would force the Firestore implementation to
+flatten it, losing live updates and the offline cache the spec calls for.
+
+Two rules hold across all three: **nothing but `DataFailure` crosses the
+boundary**, so a stack trace can never reach a price screen; and **data arriving
+from outside is validated at the parse boundary**, so downstream code can trust
+the types. Both are enforced by tests, not by convention.
 
 ## Design docs
 

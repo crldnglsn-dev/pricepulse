@@ -134,9 +134,10 @@ List<_Threshold> _thresholds(String text) {
   final out = <_Threshold>[];
   for (final m in RegExp(r'\d+(?:\.\d+)?').allMatches(text)) {
     final start = m.start;
-    final before = text
-        .substring(start == 0 ? 0 : start - 24, start)
-        .toLowerCase();
+    // Clamp: Dart throws on a negative start where JS substr silently clamps.
+    // A guard that crashes must never be mistaken for one that passes.
+    final beforeStart = start > 24 ? start - 24 : 0;
+    final before = text.substring(beforeStart, start).toLowerCase();
     final afterStart = m.end;
     final after = text
         .substring(
@@ -220,6 +221,19 @@ String _stripAb(String s) {
 // --- Main --------------------------------------------------------------------
 
 void main(List<String> argv) {
+  // A gate that throws must exit non-zero. Wrapping the whole run means an
+  // unexpected error is reported as "could not run" (2), never as clean (0).
+  try {
+    _run(argv);
+  } on Object catch (error, stack) {
+    stderr.writeln('floor-guard: crashed — $error');
+    stderr.writeln(stack);
+    stderr.writeln('This is NOT a pass. The guard could not complete.');
+    exit(2);
+  }
+}
+
+void _run(List<String> argv) {
   final i = argv.indexOf('--base');
   final base = i > -1 && i + 1 < argv.length ? argv[i + 1] : _baseFrom(_args);
 

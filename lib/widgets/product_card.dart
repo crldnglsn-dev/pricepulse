@@ -152,21 +152,30 @@ class _PriceRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Row (not Wrap): children must share the single line, and both sides
-    // stay flexible so a long peso amount shrinks instead of overflowing a
-    // 320dp two-column card.
-    return Row(
+    // Two separate constraints, solved separately.
+    //
+    // 1. The price cannot always fit. "₱9,013.65" measures 145dp at the card's
+    //    16dp price style, but a 320dp two-column card has 114dp of inner
+    //    width — no amount of flexing changes that. FittedBox(scaleDown) keeps
+    //    every digit visible and shrinks only when it must, which truncation
+    //    never did.
+    // 2. Price plus badge often does not fit on one line, so the badge wraps.
+    //    The image is the Expanded child, so an extra line is absorbed and the
+    //    fixed mainAxisExtent still holds.
+    return Wrap(
+      spacing: AppSpacing.xs,
+      runSpacing: AppSpacing.xxs,
+      crossAxisAlignment: WrapCrossAlignment.center,
       children: [
-        Flexible(
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.centerLeft,
           child: PriceText(
             amount: lowest?.price ?? 0,
             style: AppTypography.price,
           ),
         ),
-        if (savings != null) ...[
-          const SizedBox(width: AppSpacing.xs),
-          Flexible(child: SavingsBadge(amount: savings!)),
-        ],
+        if (savings != null) SavingsBadge(amount: savings!),
       ],
     );
   }

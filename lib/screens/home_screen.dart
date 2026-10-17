@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../data/categories.dart';
 import '../models/product.dart';
+import '../providers/favorites_provider.dart';
 import '../providers/products_provider.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_layout.dart';
@@ -144,6 +145,33 @@ class _HomeContent extends StatelessWidget {
   final ValueChanged<String> onCategoryTap;
   final Future<void> Function() onRefresh;
 
+  /// Saves or unsaves, then reports the outcome. The copy is chosen by the
+  /// repository's scope, so a local favorite is never described as synced.
+  Future<void> _toggleFavorite(
+    BuildContext context,
+    FavoritesProvider favorites,
+    Product product,
+  ) async {
+    final saved = !favorites.isSaved(product.id);
+    final lowest = product.lowestOffer;
+    final ok = await favorites.toggle(
+      product.id,
+      save: saved,
+      name: product.name,
+      imageUrl: product.imageUrl,
+      lastKnownPrice: lowest?.price,
+      lastKnownStore: lowest?.store.displayName,
+    );
+    if (!context.mounted) return;
+    showFavoriteResult(
+      context,
+      succeeded: ok,
+      saved: saved,
+      scope: favorites.scope,
+      failure: favorites.lastFailure,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final featured = products.where((p) => p.featured).toList();
@@ -246,19 +274,18 @@ class _HomeContent extends StatelessWidget {
                   mainAxisSpacing: AppSpacing.gridGap,
                   mainAxisExtent: gridExtent,
                 ),
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) => ProductCard(
-                    product: products[index],
-                    onTap: () => onProductTap(products[index]),
-                    onFavoriteTap: () => showAppSnackbar(
-                      context,
-                      'Cloud-synced favorites arrive with accounts in a later '
-                      'milestone.',
-                      kind: SnackbarKind.info,
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  final product = products[index];
+                  return Consumer<FavoritesProvider>(
+                    builder: (context, favorites, _) => ProductCard(
+                      product: product,
+                      isFavorite: favorites.isSaved(product.id),
+                      onTap: () => onProductTap(product),
+                      onFavoriteTap: () =>
+                          _toggleFavorite(context, favorites, product),
                     ),
-                  ),
-                  childCount: products.length,
-                ),
+                  );
+                }, childCount: products.length),
               ),
             ),
           ],

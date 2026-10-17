@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
+import '../data/data_failure.dart';
+import '../data/favorites_repository.dart';
 import 'buttons.dart';
 
 enum SnackbarKind { success, error, info }
@@ -44,6 +46,36 @@ void _showAppSnackbar(
         ),
       ),
     );
+}
+
+/// Reports the outcome of a favorite write.
+///
+/// The copy is chosen by [scope], never hard-coded at the call site, because the
+/// one thing this app must not do is tell the user their favorite is synced
+/// when it is only on this device.
+void showFavoriteResult(
+  BuildContext context, {
+  required bool succeeded,
+  required bool saved,
+  required FavoriteScope scope,
+  DataFailure? failure,
+}) {
+  if (!succeeded) {
+    showAppSnackbar(
+      context,
+      failure?.message ?? 'Could not save that favorite. Try again.',
+      kind: SnackbarKind.error,
+    );
+    return;
+  }
+  final onDevice = scope == FavoriteScope.local ? ' on this device' : '';
+  showAppSnackbar(
+    context,
+    saved
+        ? 'Saved$onDevice. Sync to an account comes later.'
+        : 'Removed from favorites$onDevice.',
+    kind: SnackbarKind.info,
+  );
 }
 
 /// Confirmation-style dialog. Spec: design/02 §2.8 `AppDialog`.

@@ -13,6 +13,8 @@ import 'package:pricepulse/widgets/empty_state.dart';
 import 'package:pricepulse/widgets/offer_row.dart';
 import 'package:pricepulse/widgets/skeletons.dart';
 
+import 'fixtures.dart';
+
 /// Regression tests for the UI review pass. Each test pins a defect that was
 /// actually fixed, so the same breakage cannot quietly return.
 void main() {
@@ -47,7 +49,7 @@ void main() {
         theme: buildAppTheme(),
         home: MediaQuery(
           data: MediaQueryData(textScaler: TextScaler.linear(textScale)),
-          child: ProductDetailsScreen(product: product),
+          child: harnessProviders(ProductDetailsScreen(product: product)),
         ),
       ),
     );

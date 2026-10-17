@@ -9,6 +9,8 @@ import 'package:pricepulse/screens/product_details_screen.dart';
 import 'package:pricepulse/theme/app_theme.dart';
 import 'package:pricepulse/widgets/offer_row.dart';
 
+import 'fixtures.dart';
+
 /// The hand-off to a store leaves the app, so it must be confirmed first. These
 /// tests fail if a launch ever happens without the user agreeing to it.
 void main() {
@@ -50,7 +52,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         theme: buildAppTheme(),
-        home: ProductDetailsScreen(product: buildProduct()),
+        home: harnessProviders(ProductDetailsScreen(product: buildProduct())),
       ),
     );
     await tester.pumpAndSettle();
@@ -162,7 +164,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         theme: buildAppTheme(),
-        home: ProductDetailsScreen(product: buildProduct()),
+        home: harnessProviders(ProductDetailsScreen(product: buildProduct())),
       ),
     );
     await tester.pumpAndSettle();
@@ -195,7 +197,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         theme: buildAppTheme(),
-        home: ProductDetailsScreen(product: product),
+        home: harnessProviders(ProductDetailsScreen(product: product)),
       ),
     );
     await tester.pumpAndSettle();

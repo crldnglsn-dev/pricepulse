@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../models/offer.dart';
@@ -9,6 +10,7 @@ import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
 import '../utils/formatters.dart';
 import '../utils/link_utils.dart';
+import '../providers/favorites_provider.dart';
 import '../widgets/buttons.dart';
 import '../widgets/feedback.dart';
 import '../widgets/offer_row.dart';
@@ -32,19 +34,26 @@ class ProductDetailsScreen extends StatefulWidget {
 }
 
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
-  bool _favorite = false;
-
   Product get product => widget.product;
 
-  void _toggleFavorite() {
-    // Local-only preview toggle while auth/favorites (Milestone 8) is pending.
-    setState(() => _favorite = !_favorite);
-    showAppSnackbar(
+  Future<void> _toggleFavorite(bool saved) async {
+    final favorites = context.read<FavoritesProvider>();
+    final lowest = product.lowestOffer;
+    final ok = await favorites.toggle(
+      product.id,
+      save: saved,
+      name: product.name,
+      imageUrl: product.imageUrl,
+      lastKnownPrice: lowest?.price,
+      lastKnownStore: lowest?.store.displayName,
+    );
+    if (!mounted) return;
+    showFavoriteResult(
       context,
-      _favorite
-          ? 'Added to favorites — cloud sync arrives with accounts.'
-          : 'Removed from favorites.',
-      kind: _favorite ? SnackbarKind.info : SnackbarKind.info,
+      succeeded: ok,
+      saved: saved,
+      scope: favorites.scope,
+      failure: favorites.lastFailure,
     );
   }
 
@@ -109,7 +118,12 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           icon: const Icon(Icons.arrow_back_rounded),
         ),
         actions: [
-          FavoriteButton(isFavorite: _favorite, onPressed: _toggleFavorite),
+          Consumer<FavoritesProvider>(
+            builder: (context, favorites, _) => FavoriteButton(
+              isFavorite: favorites.isSaved(product.id),
+              onPressed: () => _toggleFavorite(!favorites.isSaved(product.id)),
+            ),
+          ),
           const SizedBox(width: AppSpacing.xs),
         ],
       ),

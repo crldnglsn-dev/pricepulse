@@ -21,8 +21,7 @@ class PricePulseApp extends StatelessWidget {
               ProductsProvider(const SeedProductsRepository())..load(),
         ),
         ChangeNotifierProvider(
-          create: (_) =>
-              FavoritesProvider(StoredFavoritesRepository())..load(),
+          create: (_) => FavoritesProvider(StoredFavoritesRepository())..load(),
         ),
       ],
       child: MaterialApp(

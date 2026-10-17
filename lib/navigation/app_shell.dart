@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../screens/favorites_screen.dart';
 import '../screens/home_screen.dart';
 import '../screens/pending_screens.dart';
 
@@ -24,7 +25,7 @@ class _AppShellState extends State<AppShell> {
         index: _index,
         children: [
           HomeScreen(onAccountTap: () => _selectTab(2)),
-          const FavoritesPendingScreen(),
+          FavoritesScreen(onDiscover: () => _selectTab(0)),
           const AccountPendingScreen(),
         ],
       ),

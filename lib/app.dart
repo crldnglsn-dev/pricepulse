@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'data/in_memory_favorites_repository.dart';
+import 'data/stored_favorites_repository.dart';
 import 'data/product_repository.dart';
 import 'navigation/app_shell.dart';
 import 'providers/favorites_provider.dart';
@@ -22,7 +22,7 @@ class PricePulseApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (_) =>
-              FavoritesProvider(InMemoryFavoritesRepository())..load(),
+              FavoritesProvider(StoredFavoritesRepository())..load(),
         ),
       ],
       child: MaterialApp(

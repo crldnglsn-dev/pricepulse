@@ -50,10 +50,18 @@ void main() {
         PermissionDeniedFailure(),
         UnexpectedFailure(),
         UnsupportedOperationFailure('x'),
+        StorageWriteFailure(),
+        StorageUnavailableFailure(),
       ];
       for (final f in all) {
         expect(f.message.trim(), isNotEmpty, reason: f.runtimeType.toString());
       }
+    });
+
+    test('a storage failure is not retried immediately', () {
+      // The remedy is disk space, not another attempt.
+      expect(const StorageWriteFailure().isRetryable, isFalse);
+      expect(const StorageUnavailableFailure().isRetryable, isTrue);
     });
   });
 

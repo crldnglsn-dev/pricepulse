@@ -88,6 +88,32 @@ final class ParseFailure extends MalformedDataFailure {
   final String field;
 }
 
+/// Favorites could not be written to device storage.
+///
+/// Distinct from [UnreachableFailure] because the remedy is different: this is
+/// a local disk problem, not a network problem, and retrying immediately will
+/// not help.
+final class StorageWriteFailure extends DataFailure {
+  const StorageWriteFailure([
+    super.message =
+        'Could not save to this device. Free up some space and '
+        'try again.',
+  ]);
+
+  @override
+  bool get isRetryable => false;
+}
+
+/// Device storage is not available yet — the read has not completed.
+final class StorageUnavailableFailure extends DataFailure {
+  const StorageUnavailableFailure([
+    super.message = 'Saved items are still loading.',
+  ]);
+
+  @override
+  bool get isRetryable => true;
+}
+
 /// The build genuinely cannot do this yet.
 ///
 /// This is a product statement, not a stub: the prototype ships with no auth

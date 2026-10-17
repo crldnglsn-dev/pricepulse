@@ -38,6 +38,7 @@ dependencies:
   provider: ^6.1.2
   # Opens marketplace listing URLs on the device (approved stack).
   url_launcher: ^6.3.1
+  shared_preferences: ^2.5.6
 
 dev_dependencies:
   flutter_test:

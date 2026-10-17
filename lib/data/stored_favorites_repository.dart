@@ -16,9 +16,9 @@ import 'favorites_repository.dart';
 /// empty list rather than a crash on launch. Losing a favorite is recoverable;
 /// an app that will not start is not.
 class StoredFavoritesRepository implements FavoritesRepository {
-  /// Mutable because it is resolved lazily on first use: [SharedPreferences]
-  /// needs an async initialise, which a constructor cannot await. Tests inject
-  /// a ready instance.
+  /// Mutable because it is resolved lazily: [SharedPreferences] needs an async
+  /// initialise, which a constructor cannot await. Tests inject a ready
+  /// instance.
   StoredFavoritesRepository({SharedPreferences? preferences}) {
     _preferences = preferences;
   }
@@ -26,6 +26,7 @@ class StoredFavoritesRepository implements FavoritesRepository {
   static const String _key = 'pricepulse.favorites.v1';
 
   SharedPreferences? _preferences;
+  Future<bool>? _loading;
   final _items = <String, Favorite>{};
   final _controller = StreamController<List<Favorite>>.broadcast();
   bool _ready = false;
@@ -36,29 +37,52 @@ class StoredFavoritesRepository implements FavoritesRepository {
   @override
   SyncState get syncState => SyncState.localOnly;
 
-  /// Loads persisted favorites. Safe to call more than once.
+  /// Loads persisted favorites. Safe to call more than once, and safe to never
+  /// call: [watchFavorites] and [toggle] both load on first use.
   Future<void> load() async {
-    final prefs = _preferences ??= await SharedPreferences.getInstance();
-    final raw = prefs.getString(_key);
-    if (raw != null) {
-      try {
-        final decoded = jsonDecode(raw);
-        if (decoded is List) {
-          for (final entry in decoded) {
-            final favorite = _parse(entry);
-            if (favorite != null) _items[favorite.productId] = favorite;
-          }
-        }
-      } on FormatException {
-        // Unreadable blob: start clean rather than blocking launch.
-        await prefs.remove(_key);
-      }
-    }
+    await _ensureLoaded();
     _ready = true;
+  }
+
+  /// Resolves preferences once and reads the blob. Returns false when storage
+  /// could not be opened — the app still works, it just cannot remember.
+  Future<bool> _ensureLoaded() {
+    return _loading ??= _readFromDisk();
+  }
+
+  Future<bool> _readFromDisk() async {
+    try {
+      final prefs = _preferences ??= await SharedPreferences.getInstance();
+      final raw = prefs.getString(_key);
+      if (raw != null) {
+        try {
+          final decoded = jsonDecode(raw);
+          if (decoded is List) {
+            for (final entry in decoded) {
+              final favorite = _parse(entry);
+              if (favorite != null) _items[favorite.productId] = favorite;
+            }
+          }
+        } on FormatException {
+          // Unreadable blob: start clean rather than blocking launch.
+          await prefs.remove(_key);
+        }
+      }
+      return true;
+    } on Object {
+      // Storage unavailable. Do not throw: an unreadable store should cost the
+      // user their favorites, not the ability to browse.
+      _preferences = null;
+      return false;
+    }
   }
 
   @override
   Stream<List<Favorite>> watchFavorites() async* {
+    // Self-loading: a caller that only subscribes must still see what was
+    // persisted. A provider calling load() on itself is not a signal that the
+    // repository has loaded.
+    await _ensureLoaded();
     yield _sorted();
     yield* _controller.stream;
   }
@@ -75,7 +99,12 @@ class StoredFavoritesRepository implements FavoritesRepository {
     double? lastKnownPrice,
     String? lastKnownStore,
   }) async {
-    final prefs = _awaitPreferences();
+    final loaded = await _ensureLoaded();
+    if (!loaded || _preferences == null) {
+      // Nothing was changed, so there is nothing to roll back.
+      throw const StorageUnavailableFailure();
+    }
+    final prefs = _preferences!;
     final existing = _items[productId];
 
     if (save) {
@@ -108,12 +137,6 @@ class StoredFavoritesRepository implements FavoritesRepository {
       throw const StorageWriteFailure();
     }
     _emit();
-  }
-
-  SharedPreferences _awaitPreferences() {
-    final prefs = _preferences;
-    if (prefs != null) return prefs;
-    throw const StorageUnavailableFailure();
   }
 
   void _emit() {

@@ -3,9 +3,9 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:pricepulse/data/data_failure.dart';
 import 'package:pricepulse/data/favorites_repository.dart';
 import 'package:pricepulse/data/stored_favorites_repository.dart';
+import 'package:pricepulse/providers/favorites_provider.dart';
 
 /// Slice 3: a favorite must survive an app restart.
 ///
@@ -107,14 +107,46 @@ void main() {
       await repo.dispose();
     });
 
-    test('a write before load throws a DataFailure, not a raw error', () async {
+    test('a write before any explicit load still works', () async {
+      // Regression: the app wires this as
+      // `FavoritesProvider(StoredFavoritesRepository())..load()`, where load()
+      // is the *provider's* load. Nothing ever called the repository's load(),
+      // so every write threw "Saved items are still loading". The repository
+      // must be usable through the provider with no explicit load call.
       final repo = StoredFavoritesRepository();
-      // No load() and no injected preferences: the write cannot resolve storage.
-      await expectLater(
-        repo.toggle(productId: 'a', save: true),
-        throwsA(isA<StorageUnavailableFailure>()),
-      );
+      final provider = FavoritesProvider(repo)..load();
+      await Future<void>.delayed(Duration.zero);
+      await Future<void>.delayed(Duration.zero);
+
+      final ok = await provider.toggle('logitech_g102', save: true);
+      expect(ok, isTrue, reason: provider.lastFailure?.message);
+      expect(repo.isSaved('logitech_g102'), isTrue);
+      provider.dispose();
       await repo.dispose();
     });
+
+    test(
+      'subscribing without an explicit load shows persisted favorites',
+      () async {
+        final seed = StoredFavoritesRepository();
+        await seed.load();
+        await seed.toggle(productId: 'logitech_g102', save: true, name: 'G102');
+        await seed.dispose();
+
+        // Fresh instance, no load() call at all.
+        final repo = StoredFavoritesRepository();
+        final first = await repo.watchFavorites().first;
+        expect(first.single.productId, 'logitech_g102');
+        await repo.dispose();
+      },
+    );
+
+    // The genuinely-unavailable-storage path cannot be exercised here:
+    // SharedPreferences.setMockInitialValues always succeeds and
+    // SharedPreferences is a concrete class, so there is no seam to inject a
+    // failing implementation. That is why _readFromDisk catches and returns
+    // false rather than throwing — the branch exists so a device with no
+    // writable storage degrades to "favorites do not stick" rather than a
+    // crash, and it is reachable on hardware even if not in tests.
   });
 }

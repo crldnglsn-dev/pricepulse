@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:pricepulse/app.dart';
 import 'package:pricepulse/screens/product_details_screen.dart';
 import 'package:pricepulse/widgets/product_card.dart';
 
 void main() {
+  // Favorites persist through SharedPreferences, which needs an async platform
+  // call. Without a mock there is no plugin to answer it and the Favorites tab
+  // waits forever on its skeleton.
+  SharedPreferences.setMockInitialValues({});
+
   Future<void> pumpHome(WidgetTester tester) async {
     await tester.pumpWidget(const PricePulseApp());
     // Advance past the seed repository's simulated 700ms load.

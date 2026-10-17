@@ -1,0 +1,4 @@
+These product image assets are placeholder-managed:
+
+- `assets/products/` holds `<product-id>.jpg` files once the Milestone 5 image
+  round lands. See `README.md` in this directory.

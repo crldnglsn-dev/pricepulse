@@ -46,3 +46,11 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Local agent tooling — not part of the project. These are instruction docs for
+# an AI assistant, not PricePulse source, and would otherwise be 32 of the
+# repo's tracked files.
+.agents/
+
+# Course brief supplied by the client. Not our source; not ours to publish.
+PricePulse_Flutter_Plan.docx

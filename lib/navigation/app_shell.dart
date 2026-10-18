@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../screens/account_screen.dart';
 import '../screens/favorites_screen.dart';
 import '../screens/home_screen.dart';
-import '../screens/pending_screens.dart';
 
 /// App shell — bottom navigation (Home | Favorites | Account) + tab states.
 /// Spec: design/01 §2.2, design/02 §2.10 `BottomNav`.
@@ -26,7 +26,7 @@ class _AppShellState extends State<AppShell> {
         children: [
           HomeScreen(onAccountTap: () => _selectTab(2)),
           FavoritesScreen(onDiscover: () => _selectTab(0)),
-          const AccountPendingScreen(),
+          AccountScreen(onFavoritesTap: () => _selectTab(1)),
         ],
       ),
       bottomNavigationBar: NavigationBar(

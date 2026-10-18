@@ -41,9 +41,7 @@ class FavoritesScreen extends StatelessWidget {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: AppSpacing.md),
-            child: Center(
-              child: StatusChip(label: _chipLabel(favorites.scope)),
-            ),
+            child: Center(child: favoriteScopeChip(favorites.scope)),
           ),
         ],
       ),
@@ -63,11 +61,6 @@ class FavoritesScreen extends StatelessWidget {
       },
     );
   }
-
-  static String _chipLabel(FavoriteScope scope) => switch (scope) {
-    FavoriteScope.local => 'On this device',
-    FavoriteScope.cloud => 'Synced',
-  };
 }
 
 class _FavoritesBody extends StatelessWidget {

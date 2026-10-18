@@ -112,6 +112,50 @@ Future<bool?> showAppDialog(
   );
 }
 
+/// Information dialog with a bulleted body. Spec: design/02 §2.8 `AppDialog`.
+///
+/// Used where the copy is a list of distinct statements. The privacy notice
+/// has to match what is actually stored, and separate lines make it obvious
+/// when one of them stops being true — a single blob of prose hides that.
+Future<void> showInfoDialog(
+  BuildContext context, {
+  required String title,
+  required List<String> points,
+}) {
+  return showDialog<void>(
+    context: context,
+    builder: (dialogContext) => AlertDialog(
+      title: Text(title),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            for (final point in points)
+              Padding(
+                padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('•  ', style: AppTypography.body),
+                    Expanded(child: Text(point, style: AppTypography.body)),
+                  ],
+                ),
+              ),
+          ],
+        ),
+      ),
+      actions: [
+        PrimaryButton(
+          label: 'OK',
+          onPressed: () => Navigator.of(dialogContext).pop(),
+          expand: false,
+        ),
+      ],
+    ),
+  );
+}
+
 /// Link-unavailable dialog. Spec: design/03b §5.
 ///
 /// `url` is non-null only when a URL exists but failed to launch — in that

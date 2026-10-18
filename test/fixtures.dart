@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:pricepulse/data/auth_service.dart';
 import 'package:pricepulse/data/favorites_repository.dart';
+import 'package:pricepulse/data/guest_auth_service.dart';
 import 'package:pricepulse/data/in_memory_favorites_repository.dart';
 import 'package:pricepulse/data/product_repository.dart';
+import 'package:pricepulse/providers/auth_provider.dart';
 import 'package:pricepulse/providers/favorites_provider.dart';
 import 'package:pricepulse/models/product.dart';
 import 'package:pricepulse/providers/products_provider.dart';
@@ -18,11 +21,13 @@ Product testProduct() => SeedProductsRepository.products.first;
 /// Wraps [child] in the providers a real screen expects, at the app root.
 ///
 /// Pass [catalog] to also supply the product catalog, which Home and Search
-/// require and Product Details does not.
+/// require and Product Details does not. Pass [auth] to drive the Account
+/// screen; it defaults to the prototype's guest service.
 Widget harnessProviders(
   Widget child, {
   bool catalog = false,
   FavoritesRepository? favorites,
+  AuthService? auth,
 }) {
   return MultiProvider(
     providers: [
@@ -34,6 +39,9 @@ Widget harnessProviders(
         ),
       ChangeNotifierProvider<FavoritesProvider>(
         create: (_) => FavoritesProvider(favorites ?? _throwaway())..load(),
+      ),
+      ChangeNotifierProvider<AuthProvider>(
+        create: (_) => AuthProvider(auth ?? GuestAuthService())..load(),
       ),
     ],
     child: child,

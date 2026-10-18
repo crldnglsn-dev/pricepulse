@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:pricepulse/data/catalog_parser.dart';
 import 'package:pricepulse/data/data_failure.dart';
 import 'package:pricepulse/data/favorites_repository.dart';
+import 'package:pricepulse/data/guest_auth_service.dart';
 import 'package:pricepulse/data/product_repository.dart';
 import 'package:pricepulse/models/offer.dart';
 import 'package:pricepulse/models/product.dart';
@@ -380,6 +381,75 @@ void main() {
 
       final emitted = await repo.watchFavorites().first;
       expect(emitted.map((f) => f.productId), ['new', 'old']);
+    });
+  });
+
+  group('AuthService contract', () {
+    test('the prototype service reports that it cannot authenticate', () {
+      final service = GuestAuthService();
+
+      expect(service.canAuthenticate, isFalse);
+      expect(service.currentUser, isNull);
+    });
+
+    test('authStateChanges emits the current state immediately', () async {
+      // A caller that subscribes late must not wait for an event.
+      final service = GuestAuthService();
+
+      expect(await service.authStateChanges().first, isNull);
+    });
+
+    test('a sign-in attempt fails with a DataFailure, not a raw throw', () {
+      final service = GuestAuthService();
+
+      expect(
+        () => service.signIn(email: 'a@b.co', password: 'password'),
+        throwsA(isA<DataFailure>()),
+      );
+    });
+
+    test('the failure says where favorites actually are', () {
+      // A user who cannot sign in must be told where their data is.
+      final service = GuestAuthService();
+
+      try {
+        service.signIn(email: 'a@b.co', password: 'password');
+        fail('signIn should not succeed in a build with no backend');
+      } on DataFailure catch (failure) {
+        expect(failure, isA<UnsupportedOperationFailure>());
+        expect(failure.message, contains('this device'));
+        expect(failure.isRetryable, isFalse);
+      }
+    });
+
+    test('signing out is idempotent', () async {
+      // A double tap on a logout button must not throw.
+      final service = GuestAuthService();
+
+      await service.signOut();
+      await service.signOut();
+    });
+
+    test('a password reset fails honestly rather than pretending', () {
+      final service = GuestAuthService();
+
+      expect(
+        () => service.sendPasswordReset('a@b.co'),
+        throwsA(isA<UnsupportedOperationFailure>()),
+      );
+    });
+
+    test('a registration attempt fails honestly too', () {
+      final service = GuestAuthService();
+
+      expect(
+        () => service.register(
+          email: 'a@b.co',
+          password: 'password',
+          displayName: 'Angela',
+        ),
+        throwsA(isA<UnsupportedOperationFailure>()),
+      );
     });
   });
 

@@ -125,18 +125,22 @@
 
 ## 4. Account
 
+**Prototype status.** This build has no accounts and no server. The signed-out shell below is what actually ships. The signed-in layout is written against the `AuthService` contract rather than against Firebase, so it activates when a Firebase-backed service replaces the guest one — swapping the service is a one-line change in `app.dart`, and no screen imports a backend.
+
+**The rule for this screen.** It is the screen most able to lie: it is where a prototype would be tempted to show a profile, a sync status and a log-out button it does not have. Nothing here may imply a session, a sync or a server that does not exist. Where the original spec assumed a backend, the copy is corrected rather than aspirational.
+
 ### 4.1 Signed-in layout
 
 ```
 ┌ AppBar (56): "Account" ─────────────────────┐
 ├────────────────────────────────────────────┤
 │  ┌ Profile header ──────────────────────┐  │
-│  │ (A)  Angela Santos                  │  │  avatar 64 primaryContainer
-│  │      angela.santos@gmail.com        │  │  name title / email caption
+│  │ (A)  Angela Santos                  │  │  avatar 56 primaryContainer
+│  │      angela.santos@gmail.com        │  │  name headline2 / email caption
 │  └─────────────────────────────────────┘  │
 │  ┌ List card ───────────────────────────┐  │
 │  │ ♥  My favorites        (12)      ›   │  │  → Favorites tab (live count)
-│  │ ☁  Sync status               ●Synced│  │  StatusChip inline
+│  │ ☁  Where favorites are saved  ●On this device │  StatusChip inline
 │  │ ℹ  App info               v1.0.0  ›  │  │  dialog (version/build/stack)
 │  │ 🔒  Privacy & data             ›    │  │  dialog (honest scope)
 │  └─────────────────────────────────────┘  │
@@ -146,22 +150,29 @@
 
 ### 4.2 Specs
 
-- Profile header shows Firebase `displayName`/`email`; no edit-profile in the prototype (documented out-of-scope, no dead control).
-- "My favorites" shows live count; tap → Favorites tab.
-- "Sync status" mirrors the Favorites `StatusChip`.
-- "App info" dialog: PricePulse 1.0.0 (build 1) · Flutter + Firebase Auth + Cloud Firestore · "Built as an academic prototype" caption.
-- "Log out": dialog "Log out of PricePulse?" — `TextButton` "Cancel" + destructive "Log out". After: session cleared, Favorites shows its signed-out prompt, snackbar "You've been logged out."
+- Profile header shows `displayName`/`email` from the `AuthUser`; no edit-profile in the prototype (documented out-of-scope, no dead control). Without a display name the email is the heading and is not repeated below it.
+- "My favorites" shows the live count; tap → Favorites tab. While the store is still loading the count is a dash, never `0` — showing zero would claim the answer is known.
+- "Where favorites are saved" carries the same `StatusChip` as the Favorites tab, worded from the same helper so the two screens cannot disagree. It reads **"On this device"** in this build. The spec's original row was called "Sync status"; that name is not used, because there is no sync to report.
+- The trailing chip and the row label are both flexible, so the row survives a 200% text scale on a 320dp phone.
+- "App info" dialog: PricePulse 1.0.0 (build 1) · Flutter · local device storage · "Built as an academic prototype".
+- "Log out": shown only when signed in. Dialog "Log out of PricePulse?" — `TextButton` "Cancel" + destructive "Log out". After: session cleared, snackbar "You've been logged out."
+- A "Log out" button is never shown without a session. A control that does nothing is worse than no control.
 
 ### 4.3 Privacy & data dialog (honest scope)
 
-- "PricePulse stores your name, email address, and favorites in Cloud Firestore."
+- "Your favorites are stored on this device only. Nothing is uploaded, and this build has no account to attach to."
 - "Product prices are recorded records — they are not fetched live from store APIs."
-- "Opening a listing hands off to the store's website or app. PricePulse doesn't collect store-side data."
-- "Your favorites are only visible to your account."
+- "Opening a listing hands off to the store's app or website. PricePulse does not collect store-side data."
+- "Removing the app removes your favorites with it."
+
+The dialog must match what is actually stored. The original spec's text named Cloud Firestore, which is not in this build, so it is corrected here. Design QA §3.5 requires this dialog to match stored data exactly.
 
 ### 4.4 Signed-out state
 
-Same shell, profile header replaced by compact auth entry: lockup + tagline, `PrimaryButton` "Sign in", `TextButton` "Create account", caption "Saving favorites requires an account."
+Same shell, profile header replaced by the brand lockup, the tagline "Compare recorded prices across Shopee, Lazada & TikTok Shop.", `PrimaryButton` "Sign in", `TextButton` "Create account", and a caption saying that accounts are not part of this prototype build while favorites are saved on this device and work without signing in.
+
+- The original §4.4 caption, "Saving favorites requires an account", is **wrong for this build** and is not used. Favorites work without an account here, so the opposite is true.
+- "Sign in" and "Create account" open an honest notice explaining that accounts are not part of this build and where favorites actually live. They are not dead controls and they are not a fake form. A real sign-in form arrives with the backend.
 
 ---
 

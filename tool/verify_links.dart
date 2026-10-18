@@ -25,12 +25,43 @@ final _mobileAgent =
 /// probing deliberately-fake URLs.
 ///
 /// Only Lazada does. Shopee and TikTok Shop answer HTTP 200 for pages that do
-/// not exist, so a "200" from them proves nothing — those links can only be
-/// confirmed by opening them on a device.
+/// not exist, so a "200" from them proves nothing.
 const _storesThatDetectMissing = ['lazada.com.ph'];
 
 bool _canTrustStatus(String url) =>
     _storesThatDetectMissing.any(url.toLowerCase().contains);
+
+/// TikTok Shop exposes a per-product endpoint that answers with raw JSON
+/// instead of the web app shell, so a dead product id is detectable without a
+/// browser:
+///
+///     GET https://shop.tiktok.com/pdp/<id>
+///     -> {"errorCode":-1,"errorMessage":"Product ID is invalid"}
+///
+/// The `/ph/pdp/<id>` form in the seed data returns the JS shell, which carries
+/// no error at all — that is why a status-code check on those URLs is
+/// meaningless. Stripping the `/ph` locale segment turns the page into an
+/// API-style response that states plainly whether the id exists.
+///
+/// Measured on 2026-10-17: all four seed TikTok ids returned "Product ID is
+/// invalid", i.e. they are stale ids from an old search index, not live
+/// listings.
+bool _isTikTok(String url) => url.toLowerCase().contains('tiktok.com');
+
+Future<String> _probeTikTok(HttpClient client, String url) async {
+  // https://shop.tiktok.com/ph/pdp/<id> -> https://shop.tiktok.com/pdp/<id>
+  final apiUrl = url.replaceFirst(RegExp(r'/ph(/|$)'), '/');
+  final req = await client
+      .getUrl(Uri.parse(apiUrl))
+      .timeout(const Duration(seconds: 15));
+  final res = await req.close().timeout(const Duration(seconds: 15));
+  final body = await res.transform(const SystemEncoding().decoder).join();
+  if (body.contains('"errorCode"')) {
+    final m = RegExp(r'"errorMessage"\s*:\s*"([^"]*)"').firstMatch(body);
+    return 'DEAD — ${m?.group(1) ?? 'invalid product id'}';
+  }
+  return 'LIVE';
+}
 
 Future<void> main(List<String> args) async {
   final file = File(_seedPath);
@@ -68,6 +99,18 @@ Future<void> main(List<String> args) async {
       continue;
     }
 
+    if (_isTikTok(url)) {
+      // Checked against the product-id endpoint instead of the page.
+      final verdict = await _probeTikTok(client, url);
+      if (verdict.startsWith('LIVE')) {
+        live++;
+      } else {
+        dead++;
+      }
+      stdout.writeln('  $verdict  $url');
+      continue;
+    }
+
     final result = await _probe(client, url);
     final trustworthy = _canTrustStatus(url);
     final String label;
@@ -96,8 +139,10 @@ Future<void> main(List<String> args) async {
     );
   }
   stdout.writeln(
-    'Reachable != working. Only Lazada returns real 404s, so Shopee and '
-    'TikTok Shop "UNVERIFIED" rows must be opened on a device by hand.',
+    'Reachable != working. Lazada returns real 404s, so LIVE is trustworthy. '
+    'Shopee answers 200 for pages that do not exist, so its UNVERIFIED rows '
+    'must be opened on a device. TikTok Shop is checked against its '
+    'product-id endpoint, so DEAD there is definitive.',
   );
 
   if (dead > 0) {

@@ -1,6 +1,6 @@
 # Constraints
 
-Last reviewed: 2026-10-17 by @carlj
+Last reviewed: 2026-10-18 by @carlj
 
 The bar for PricePulse. Every number below has a command that produces the
 verdict, and a reason. A dimension with a number and no command is an
@@ -47,7 +47,7 @@ Enforced by `dart run tool/floor_guard.dart` (exit 1 = blocked).
 **Why these numbers**
 
 - **80% coverage.** High enough to force a test for new logic, low enough to
-  admit a config constant. The codebase sits at 86.8%, so this floor has
+  admit a config constant. The codebase sits at 90.2%, so this floor has
   headroom rather than being a wall — see the ratchet below.
 - **44dp targets.** WCAG 2.1 AA floor. `design/04` §3.4 sets the same bar, so
   the constraint and the spec agree.
@@ -83,7 +83,7 @@ every edit as `threshold-changed`.
 
 | Metric | Today | | Detail |
 |--------|-------|---|--------|
-| Total line coverage, lib/ | 88.4% must not fall | | 1178 of 1333 lines |
+| Total line coverage, lib/ | 90.2% must not fall | | 1573 of 1744 lines |
 | Asset payload | 1805 KB must not grow | | bundled fonts and images |
 | Seed products on 3 verified stores | 3 must not fall | | of 5 |
 | Placeholder product records | 0 must not grow | | example.invalid hosts |
@@ -131,13 +131,20 @@ dart run tool/coverage_check.dart --min 80 --changed 80
 
 # before a demo (network — only Lazada returns real 404s)
 dart run tool/verify_links.dart
+
+# before a demo (device — the only way to confirm Shopee and TikTok links)
+./tool/device_open.ps1 -Label shopee -Pkg com.shopee.ph -Url "<listing url>"
 ```
 
 `tool/verify_links.dart` reports `UNVERIFIED` for Shopee and TikTok Shop
 because both answer HTTP 200 for pages that do not exist. Those links are only
-really confirmed by opening them on a device. That limitation is recorded
-rather than hidden, and it is why the command is a pre-demo gate and not an
-every-edit one.
+really confirmed by opening them on a device, which `tool/device_open.ps1`
+does: it force-stops the app and the browser, launches the URL cold, and
+reports the focused activity plus a screenshot. A stale app keeps whatever page
+it was on and silently "passes" the check, so the force-stop is not optional.
+
+That limitation is recorded rather than hidden, and it is why the command is a
+pre-demo gate and not an every-edit one.
 
 ---
 

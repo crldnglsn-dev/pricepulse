@@ -130,7 +130,43 @@ final _maxAfter = RegExp(
   caseSensitive: false,
 );
 
+/// Splits a rule line into its cells. A table row has one cell per column; a
+/// bullet rule is a single cell.
+List<String> _cells(String text) {
+  final s = text.trim();
+  if (!s.startsWith('|')) return [s];
+  return s
+      .split('|')
+      .map((c) => c.trim())
+      .where((c) => c.isNotEmpty)
+      .toList();
+}
+
+/// The numbers a rule line states, with the direction each one implies.
+///
+/// A rule states its threshold in the cell that carries the direction — "at
+/// least 80%", "must not grow". Numbers in the other cells are supporting
+/// detail — "1573 of 1744 lines" — and they necessarily change whenever the
+/// rule is restated, because they describe the current state of the thing the
+/// rule constrains. Comparing detail as if it were a threshold blocks every
+/// legitimate ratchet raise, and a guard that always blocks is a guard that
+/// gets switched off.
+///
+/// When no cell states a direction, every number in the row is treated as a
+/// threshold. That is the conservative reading: a rule whose direction cannot
+/// be read is blocked, not waved through.
 List<_Threshold> _thresholds(String text) {
+  final directed = <_Threshold>[];
+  final undirected = <_Threshold>[];
+  for (final cell in _cells(text)) {
+    for (final t in _thresholdsIn(cell)) {
+      (t.direction == null ? undirected : directed).add(t);
+    }
+  }
+  return directed.isNotEmpty ? directed : undirected;
+}
+
+List<_Threshold> _thresholdsIn(String text) {
   final out = <_Threshold>[];
   for (final m in RegExp(r'\d+(?:\.\d+)?').allMatches(text)) {
     final start = m.start;

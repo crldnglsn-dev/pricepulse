@@ -270,7 +270,7 @@ class _PriceSummaryCard extends StatelessWidget {
               PriceText(
                 amount: lowest.price,
                 style: AppTypography.priceLarge.copyWith(
-                  color: multi ? AppColors.success : AppColors.textPrimary,
+                  color: multi ? AppColors.onSuccess : AppColors.textPrimary,
                 ),
               ),
               if (multi)
@@ -346,7 +346,7 @@ class _AboutSectionState extends State<_AboutSection> {
             padding: EdgeInsets.zero,
             minimumSize: const Size(0, 40),
             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            foregroundColor: AppColors.link,
+            foregroundColor: AppColors.accent,
           ),
           child: Text(
             _expanded ? 'Less' : 'More',

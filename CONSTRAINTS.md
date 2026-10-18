@@ -37,6 +37,7 @@ Enforced by `dart run tool/floor_guard.dart` (exit 1 = blocked).
 | Coverage: changed | Every changed `lib/` file at least 80% line covered | `dart run tool/coverage_check.dart --changed 80` | task end |
 | Tests | All tests pass, none skipped | `flutter test` | every edit |
 | Accessibility | No render overflow at 320/768/1440dp or at 200% text scale | `flutter test test/ui_resilience_test.dart` | every edit |
+| Accessibility | Every text token clears its contrast floor on the surface it sits on | `flutter test test/theme_contrast_test.dart` | every edit |
 | Accessibility | Interactive targets at least 44dp | `flutter test` + review | every edit |
 | Market data | Every seed offer points at a real marketplace host, never `example.invalid` | `flutter test test/seed_data_test.dart` | every edit |
 | Market data | Every referenced image file exists and is a real JPEG or PNG | `flutter test test/seed_data_test.dart` | every edit |
@@ -47,7 +48,7 @@ Enforced by `dart run tool/floor_guard.dart` (exit 1 = blocked).
 **Why these numbers**
 
 - **80% coverage.** High enough to force a test for new logic, low enough to
-  admit a config constant. The codebase sits at 90.2%, so this floor has
+  admit a config constant. The codebase sits at 95.4%, so this floor has
   headroom rather than being a wall — see the ratchet below.
 - **44dp targets.** WCAG 2.1 AA floor. `design/04` §3.4 sets the same bar, so
   the constraint and the spec agree.
@@ -83,8 +84,8 @@ every edit as `threshold-changed`.
 
 | Metric | Today | | Detail |
 |--------|-------|---|--------|
-| Total line coverage, lib/ | 90.2% must not fall | | 1573 of 1744 lines |
-| Asset payload | 1805 KB must not grow | | bundled fonts and images |
+| Total line coverage, lib/ | 95.4% must not fall | | 1755 of 1840 lines |
+| Asset payload | 450 KB must not grow | | bundled fonts and images |
 | Seed products on 3 verified stores | 3 must not fall | | of 5 |
 | Placeholder product records | 0 must not grow | | example.invalid hosts |
 
@@ -95,7 +96,10 @@ decay.
 
 The assets figure is a real risk. Five bundled images are 175 KB. Fifty
 products at current resolution would be ~1.75 MB before any resizing, which is
-why `MissingImage` remains a legitimate answer rather than a failure.
+why `MissingImage` remains a legitimate answer rather than a failure. The
+figure was 1805 KB until the re-skin swapped Inter's four static weights
+(1630 KB) for one 270 KB variable Nunito, which is a reminder that the font
+choice was worth 1.35 MB on its own.
 
 ---
 

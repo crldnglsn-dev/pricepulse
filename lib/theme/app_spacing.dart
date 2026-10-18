@@ -17,8 +17,10 @@ abstract final class AppSpacing {
   static const double gridGap = sm; // 12 between grid cards
 
   // Corner radius scale.
-  static const double radiusXs = 8;
-  static const double radiusSm = 12;
-  static const double radiusMd = 16;
-  static const double radiusLg = 20;
+  // Soft and generous — the rounded shape is most of what makes a UI read as
+  // friendly rather than technical.
+  static const double radiusXs = 12;
+  static const double radiusSm = 18;
+  static const double radiusMd = 24;
+  static const double radiusLg = 30;
 }

@@ -28,14 +28,15 @@ Widget harnessProviders(
   bool catalog = false,
   FavoritesRepository? favorites,
   AuthService? auth,
+  ProductRepository? products,
 }) {
   return MultiProvider(
     providers: [
       if (catalog)
         ChangeNotifierProvider<ProductsProvider>(
-          create: (_) =>
-              ProductsProvider(SeedProductsRepository(latency: Duration.zero))
-                ..load(),
+          create: (_) => ProductsProvider(
+            products ?? SeedProductsRepository(latency: Duration.zero),
+          )..load(),
         ),
       ChangeNotifierProvider<FavoritesProvider>(
         create: (_) => FavoritesProvider(favorites ?? _throwaway())..load(),

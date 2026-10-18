@@ -65,7 +65,7 @@ class SignedOutAccountHeader extends StatelessWidget {
           onPressed: () => onAccountAction('Create account'),
           child: Text(
             'Create account',
-            style: AppTypography.labelLarge.copyWith(color: AppColors.link),
+            style: AppTypography.labelLarge.copyWith(color: AppColors.accent),
           ),
         ),
         const SizedBox(height: AppSpacing.sm),

@@ -29,9 +29,12 @@ class _PressableScaleState extends State<PressableScale> {
   Widget build(BuildContext context) {
     final interactive = widget.enabled;
     return AnimatedScale(
-      scale: _pressed && interactive ? 0.97 : 1.0,
-      duration: const Duration(milliseconds: 120),
-      curve: Curves.easeOut,
+      scale: _pressed && interactive ? 0.96 : 1.0,
+      duration: const Duration(milliseconds: 150),
+      // Pressing eases in; letting go springs back past the resting size and
+      // settles. A straight linear scale-down reads as mechanical, and this
+      // app is meant to read as friendly.
+      curve: _pressed ? Curves.easeOutCubic : Curves.easeOutBack,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTapDown: interactive ? (_) => setState(() => _pressed = true) : null,
@@ -227,7 +230,7 @@ class FavoriteButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isFavorite ? AppColors.secondary : AppColors.textPrimary;
+    final color = isFavorite ? AppColors.favourite : AppColors.textPrimary;
     final icon = isFavorite ? Icons.favorite : Icons.favorite_border;
     return Semantics(
       button: true,
@@ -237,8 +240,11 @@ class FavoriteButton extends StatelessWidget {
         width: compact ? 44 : 48,
         height: compact ? 44 : 48,
         child: Material(
+          // On a photo, a scrim has to carry the glyph on top of it. A dark
+          // scrim reads as a smudge on a light theme, so the overlay is near
+          // white and the glyph carries the contrast instead.
           color: overlay
-              ? Colors.black.withValues(alpha: 0.45)
+              ? AppColors.surface.withValues(alpha: 0.92)
               : Colors.transparent,
           shape: const CircleBorder(),
           clipBehavior: Clip.antiAlias,

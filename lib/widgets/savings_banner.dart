@@ -35,25 +35,30 @@ class SavingsBanner extends StatelessWidget {
             height: 28,
             alignment: Alignment.center,
             decoration: const BoxDecoration(
-              color: AppColors.success,
+              color: AppColors.surface,
               shape: BoxShape.circle,
             ),
-            child: const Icon(
-              Icons.check,
-              size: 18,
-              color: AppColors.onSuccess,
-            ),
+            child: const Icon(Icons.check, size: 18, color: AppColors.success),
           ),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  '${formatPeso(savings)} cheaper than the highest offer',
-                  style: AppTypography.body.copyWith(
-                    color: AppColors.onSuccess,
-                    fontWeight: FontWeight.w600,
+                // The figure counts up when the screen opens. It lands on the
+                // recorded saving, which is the same number it would show
+                // without the animation — the count-up is decoration, not a
+                // different claim.
+                TweenAnimationBuilder<double>(
+                  tween: Tween(begin: 0, end: savings),
+                  duration: const Duration(milliseconds: 650),
+                  curve: Curves.easeOutCubic,
+                  builder: (context, value, _) => Text(
+                    '${formatPeso(value)} cheaper than the highest offer',
+                    style: AppTypography.body.copyWith(
+                      color: AppColors.onSuccess,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 2),

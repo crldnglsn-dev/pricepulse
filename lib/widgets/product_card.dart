@@ -12,7 +12,8 @@ import 'savings_widgets.dart';
 import 'store_mark.dart';
 
 /// Standard surface card.
-/// Spec: design/02 §2.4 — borders before shadows, pressed wash on tap.
+/// Spec: design/02 §2.4 — a soft shadow before a hard border, pressed wash
+/// on tap.
 class AppCard extends StatelessWidget {
   const AppCard({
     super.key,
@@ -23,6 +24,7 @@ class AppCard extends StatelessWidget {
     this.borderRadius = AppSpacing.radiusMd,
     this.onTap,
     this.semanticLabel,
+    this.elevated = true,
   });
 
   final Widget child;
@@ -33,28 +35,51 @@ class AppCard extends StatelessWidget {
   final VoidCallback? onTap;
   final String? semanticLabel;
 
+  /// Whether the card floats on a shadow. Off for surfaces that are already
+  /// stacked on something and would double up their depth.
+  final bool elevated;
+
   @override
   Widget build(BuildContext context) {
-    final shape = RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(borderRadius),
-      side: BorderSide(color: borderColor),
-    );
+    final radius = BorderRadius.circular(borderRadius);
     final content = Padding(padding: padding, child: child);
     return Semantics(
       button: onTap != null,
       label: semanticLabel,
-      child: Material(
-        color: color,
-        shape: shape,
-        clipBehavior: Clip.antiAlias,
-        child: onTap == null
-            ? content
-            : InkWell(
-                onTap: onTap,
-                splashColor: AppColors.primaryPressed.withValues(alpha: 0.10),
-                highlightColor: AppColors.surfaceHover.withValues(alpha: 0.6),
-                child: content,
-              ),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: radius,
+          border: Border.all(color: borderColor),
+          boxShadow: elevated
+              ? const [
+                  BoxShadow(
+                    color: AppColors.shadow,
+                    blurRadius: 20,
+                    offset: Offset(0, 8),
+                    spreadRadius: -6,
+                  ),
+                ]
+              : null,
+        ),
+        child: ClipRRect(
+          borderRadius: radius,
+          child: Material(
+            color: Colors.transparent,
+            child: onTap == null
+                ? content
+                : InkWell(
+                    onTap: onTap,
+                    splashColor: AppColors.primaryPressed.withValues(
+                      alpha: 0.10,
+                    ),
+                    highlightColor: AppColors.surfaceHover.withValues(
+                      alpha: 0.6,
+                    ),
+                    child: content,
+                  ),
+          ),
+        ),
       ),
     );
   }

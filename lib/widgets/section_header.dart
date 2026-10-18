@@ -50,7 +50,7 @@ class SectionHeader extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
               minimumSize: const Size(0, 40),
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              foregroundColor: AppColors.link,
+              foregroundColor: AppColors.accent,
             ),
             child: Text(trailingLabel!, style: AppTypography.labelSmall),
           ),

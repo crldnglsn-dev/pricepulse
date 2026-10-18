@@ -43,7 +43,7 @@ class OfferRow extends StatelessWidget {
     final borderColor = isDisabled
         ? AppColors.border
         : (isLowest
-              ? AppColors.success.withValues(alpha: 0.55)
+              ? AppColors.onSuccess.withValues(alpha: 0.45)
               : AppColors.borderSubtle);
 
     final Widget row = Container(
@@ -104,7 +104,7 @@ class OfferRow extends StatelessWidget {
                           amount: price,
                           style: isLowest
                               ? AppTypography.price.copyWith(
-                                  color: AppColors.success,
+                                  color: AppColors.onSuccess,
                                 )
                               : AppTypography.price,
                         ),

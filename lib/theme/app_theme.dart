@@ -4,11 +4,15 @@ import 'app_colors.dart';
 import 'app_spacing.dart';
 import 'app_typography.dart';
 
-/// Builds the app-wide dark ThemeData from the design tokens.
+/// Builds the app-wide light ThemeData from the design tokens.
 /// Spec: design/02_design_system.md §1 + §2.10.
+///
+/// The app is warm paper with soft, rounded, floating surfaces. Depth comes
+/// from a rose-tinted shadow rather than a hard outline, because an outline
+/// on a light surface reads as a diagram and a soft shadow reads as a card.
 ThemeData buildAppTheme() {
   const scheme = ColorScheme(
-    brightness: Brightness.dark,
+    brightness: Brightness.light,
     primary: AppColors.primary,
     onPrimary: AppColors.onPrimary,
     primaryContainer: AppColors.primaryContainer,
@@ -17,10 +21,10 @@ ThemeData buildAppTheme() {
     onSecondary: AppColors.onPrimary,
     secondaryContainer: AppColors.secondaryContainer,
     onSecondaryContainer: AppColors.secondaryTint,
-    tertiary: AppColors.primaryHover,
+    tertiary: AppColors.tertiary,
     onTertiary: AppColors.onPrimary,
     error: AppColors.error,
-    onError: AppColors.onPrimary,
+    onError: Colors.white,
     errorContainer: AppColors.errorContainer,
     onErrorContainer: AppColors.error,
     surface: AppColors.surface,
@@ -29,17 +33,17 @@ ThemeData buildAppTheme() {
     onSurfaceVariant: AppColors.textSecondary,
     outline: AppColors.border,
     outlineVariant: AppColors.borderSubtle,
-    shadow: Colors.black,
-    scrim: Colors.black54,
-    inverseSurface: AppColors.surfaceElevated,
-    onInverseSurface: AppColors.textPrimary,
+    shadow: AppColors.shadow,
+    scrim: Color(0x333E2B36),
+    inverseSurface: AppColors.textPrimary,
+    onInverseSurface: AppColors.bg,
     inversePrimary: AppColors.primaryHover,
     surfaceTint: AppColors.surface,
   );
 
   return ThemeData(
     useMaterial3: true,
-    brightness: Brightness.dark,
+    brightness: Brightness.light,
     colorScheme: scheme,
     scaffoldBackgroundColor: AppColors.bg,
     fontFamily: AppTypography.fontFamily,
@@ -57,26 +61,26 @@ ThemeData buildAppTheme() {
     navigationBarTheme: NavigationBarThemeData(
       backgroundColor: AppColors.surface,
       indicatorColor: AppColors.primaryContainer,
-      height: 64,
+      height: 68,
       elevation: 0,
       surfaceTintColor: Colors.transparent,
       labelTextStyle: WidgetStateProperty.resolveWith((states) {
         final selected = states.contains(WidgetState.selected);
         return AppTypography.labelSmall.copyWith(
-          color: selected ? AppColors.primary : AppColors.textMuted,
+          color: selected ? AppColors.onPrimaryContainer : AppColors.textMuted,
         );
       }),
       iconTheme: WidgetStateProperty.resolveWith((states) {
         final selected = states.contains(WidgetState.selected);
         return IconThemeData(
-          color: selected ? AppColors.primary : AppColors.textMuted,
+          color: selected ? AppColors.onPrimaryContainer : AppColors.textMuted,
           size: 24,
         );
       }),
     ),
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       backgroundColor: AppColors.surface,
-      selectedItemColor: AppColors.primary,
+      selectedItemColor: AppColors.onPrimaryContainer,
       unselectedItemColor: AppColors.textMuted,
       type: BottomNavigationBarType.fixed,
       elevation: 0,
@@ -91,27 +95,23 @@ ThemeData buildAppTheme() {
       surfaceTintColor: Colors.transparent,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        side: const BorderSide(color: AppColors.border),
       ),
       titleTextStyle: AppTypography.headline2,
       contentTextStyle: AppTypography.bodySecondary,
     ),
     snackBarTheme: SnackBarThemeData(
-      backgroundColor: AppColors.surfaceElevated,
-      contentTextStyle: AppTypography.body.copyWith(
-        color: AppColors.textPrimary,
-      ),
+      backgroundColor: AppColors.textPrimary,
+      contentTextStyle: AppTypography.body.copyWith(color: AppColors.bg),
       behavior: SnackBarBehavior.floating,
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-        side: const BorderSide(color: AppColors.border),
       ),
     ),
     progressIndicatorTheme: const ProgressIndicatorThemeData(
       color: AppColors.primary,
     ),
-    splashColor: AppColors.surfaceHover,
-    highlightColor: AppColors.primaryPressed.withValues(alpha: 0.12),
+    splashColor: AppColors.primaryPressed.withValues(alpha: 0.10),
+    highlightColor: AppColors.primaryPressed.withValues(alpha: 0.06),
   );
 }

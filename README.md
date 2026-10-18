@@ -7,10 +7,11 @@ what the spread costs you, and hands off to the cheapest listing.
 ## Read this first
 
 **Prices in this app are recorded, not live.** They were read off marketplace
-listings on a single date and stored. Nothing scrapes, polls, or fetches prices
-from a store API. Every price surface shows the date it was recorded and says
-the live price may differ. This is deliberate: an academic prototype that
-presented stale numbers as current would be worse than one that admitted it.
+listings and stored, each with the date it was read. Nothing scrapes, polls, or
+fetches prices from a store API. Every price surface shows the date it was
+recorded and says the live price may differ. This is deliberate: an academic
+prototype that presented stale numbers as current would be worse than one that
+admitted it.
 
 Tapping a store row always asks for confirmation before leaving the app, and
 the confirmation restates the recorded price and its date.
@@ -19,12 +20,13 @@ the confirmation restates the recorded price and its date.
 
 | Area | State |
 |---|---|
-| Design system | Complete — tokens in `lib/theme/`, Inter bundled in `assets/fonts/` |
-| Screens | Home, Product Details (comparison hero), Search Results complete |
+| Design system | Complete — tokens in `lib/theme/`, Nunito bundled as one variable font in `assets/fonts/` |
+| Screens | Home, Product Details (comparison hero), Search Results, Favorites, Account — all complete |
 | Catalog | 5 hand-curated products, real marketplace links, bundled images |
-| Favorites / Account | Contracts defined; UI not built. Not built. |
+| Favorites | Built and persisted on-device. "On this device" is stated everywhere, because sync does not exist yet. |
+| Account | Built against the `AuthService` contract. The signed-out state is what ships; a Firebase-backed service activates the signed-in one. |
 | Firebase | Not wired. The repository interfaces exist so it can be. |
-| Tests | 86 across 7 files |
+| Tests | 203 across 16 files |
 | Quality gates | `CONSTRAINTS.md`, enforced by `tool/check.ps1` |
 
 ## Data honesty
@@ -41,7 +43,15 @@ These are the rules the code enforces, not aspirations:
 - Only **Lazada** returns a real HTTP 404 for a missing listing. Shopee and
   TikTok Shop answer `200` for pages that do not exist, so
   `tool/verify_links.dart` reports those links as `UNVERIFIED` rather than
-  `LIVE`. They must be opened on a device to be truly confirmed.
+  `LIVE`. They must be opened on a device to be truly confirmed —
+  `tool/device_open.ps1` does that, force-stopping the app first so a stale
+  page cannot silently "pass".
+- Each offer carries **its own** recorded date, not one date for the whole
+  catalog. Four offers could not be re-confirmed on the last check and still
+  say so, so a stale price is visible as a stale price.
+- Contrast is tested, not eyeballed: `test/theme_contrast_test.dart` checks
+  every text token against the surface it sits on, and fails the build if one
+  drops below its floor.
 
 ## Run it
 
@@ -62,7 +72,8 @@ which command, and why that number. `tool/floor_guard.dart` watches the diff for
 the five moves that quietly lower a standard — a skipped test, a deleted
 assertion, a suppression comment, unfinished work, or a threshold edit.
 
-Current coverage: **88.4%** of `lib/`, floor 80%.
+Current coverage: **95.4%** of `lib/`, floor 80%. Every changed `lib/` file must
+also clear 80% on its own.
 
 ## Architecture
 
@@ -73,8 +84,8 @@ swapped boundaries:
 | Boundary | Shape | Today | Later |
 |---|---|---|---|
 | `ProductRepository` | `Stream<List<Product>>` | seed dataset | Firestore |
-| `FavoritesRepository` | stream + idempotent `toggle` + sync state | contract only | Firestore |
-| `AuthService` | user-or-guest + non-enumerating reset | contract only | Firebase Auth |
+| `FavoritesRepository` | stream + idempotent `toggle` + sync state | on-device, persisted | Firestore |
+| `AuthService` | user-or-guest + non-enumerating reset | guest service, no backend | Firebase Auth |
 
 `ProductRepository` is a stream rather than a future on purpose: Firestore hands
 you a stream, and declaring a future would force the Firestore implementation to

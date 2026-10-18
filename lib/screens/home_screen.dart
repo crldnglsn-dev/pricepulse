@@ -11,11 +11,13 @@ import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
 import '../widgets/category_chips.dart';
 import '../widgets/empty_state.dart';
+import '../widgets/entrance.dart';
 import '../widgets/feedback.dart';
 import '../widgets/product_card.dart';
 import '../widgets/search_bar.dart';
 import '../widgets/section_header.dart';
 import '../widgets/skeletons.dart';
+import '../widgets/soft_background.dart';
 import 'product_details_screen.dart';
 import 'search_screen.dart';
 
@@ -89,7 +91,7 @@ class _HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
           const Icon(
             Icons.trending_down_rounded,
             size: 22,
-            color: AppColors.primary,
+            color: AppColors.accent,
           ),
           const SizedBox(width: AppSpacing.xs),
           Flexible(
@@ -180,115 +182,124 @@ class _HomeContent extends StatelessWidget {
 
     return RefreshIndicator(
       onRefresh: onRefresh,
-      color: AppColors.primary,
+      color: AppColors.accent,
       backgroundColor: AppColors.surface,
       child: AppLayout.centerContent(
-        CustomScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          slivers: [
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.md,
-                  AppSpacing.sm,
-                  AppSpacing.md,
-                  0,
-                ),
-                child: SearchBarHome(
-                  productCount: products.length,
-                  onTap: onSearchTap,
-                ),
-              ),
-            ),
-            SliverToBoxAdapter(
-              child: Padding(
-                // Trailing padding lives on the chips themselves so the scroll
-                // row is inset at both ends without boxing in the grid below.
-                padding: const EdgeInsets.only(top: AppSpacing.md),
-                child: CategoryChips(
-                  categories: kCategories,
-                  selected: 'All',
-                  onSelected: (label) {
-                    if (label != 'All') onCategoryTap(label);
-                  },
-                ),
-              ),
-            ),
-            if (featured.isNotEmpty) ...[
-              const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xl)),
+        SoftBackground(
+          child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: [
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.md,
-                  ),
-                  child: const SectionHeader(title: 'Top picks'),
-                ),
-              ),
-              SliverToBoxAdapter(
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.fromLTRB(
                     AppSpacing.md,
                     AppSpacing.sm,
                     AppSpacing.md,
                     0,
                   ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      for (var i = 0; i < featured.length; i++) ...[
-                        if (i > 0) const SizedBox(width: AppSpacing.sm),
-                        FeaturedCard(
-                          product: featured[i],
-                          onTap: () => onProductTap(featured[i]),
-                        ),
-                      ],
-                    ],
+                  child: SearchBarHome(
+                    productCount: products.length,
+                    onTap: onSearchTap,
                   ),
                 ),
               ),
-            ],
-            const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xl)),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                child: SectionHeader(
-                  title: 'All products',
-                  count: products.length,
-                  trailingLabel: 'See all',
-                  onTrailingTap: onSearchTap,
+              SliverToBoxAdapter(
+                child: Padding(
+                  // Trailing padding lives on the chips themselves so the scroll
+                  // row is inset at both ends without boxing in the grid below.
+                  padding: const EdgeInsets.only(top: AppSpacing.md),
+                  child: CategoryChips(
+                    categories: kCategories,
+                    selected: 'All',
+                    onSelected: (label) {
+                      if (label != 'All') onCategoryTap(label);
+                    },
+                  ),
                 ),
               ),
-            ),
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.md,
-                AppSpacing.sm,
-                AppSpacing.md,
-                AppSpacing.xl,
-              ),
-              sliver: SliverGrid(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: AppLayout.gridColumns(context),
-                  crossAxisSpacing: AppSpacing.gridGap,
-                  mainAxisSpacing: AppSpacing.gridGap,
-                  mainAxisExtent: gridExtent,
+              if (featured.isNotEmpty) ...[
+                const SliverToBoxAdapter(
+                  child: SizedBox(height: AppSpacing.xl),
                 ),
-                delegate: SliverChildBuilderDelegate((context, index) {
-                  final product = products[index];
-                  return Consumer<FavoritesProvider>(
-                    builder: (context, favorites, _) => ProductCard(
-                      product: product,
-                      isFavorite: favorites.isSaved(product.id),
-                      onTap: () => onProductTap(product),
-                      onFavoriteTap: () =>
-                          _toggleFavorite(context, favorites, product),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md,
                     ),
-                  );
-                }, childCount: products.length),
+                    child: const SectionHeader(title: 'Top picks'),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.md,
+                      AppSpacing.sm,
+                      AppSpacing.md,
+                      0,
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        for (var i = 0; i < featured.length; i++) ...[
+                          if (i > 0) const SizedBox(width: AppSpacing.sm),
+                          FeaturedCard(
+                            product: featured[i],
+                            onTap: () => onProductTap(featured[i]),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+              const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xl)),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                  ),
+                  child: SectionHeader(
+                    title: 'All products',
+                    count: products.length,
+                    trailingLabel: 'See all',
+                    onTrailingTap: onSearchTap,
+                  ),
+                ),
               ),
-            ),
-          ],
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.md,
+                  AppSpacing.sm,
+                  AppSpacing.md,
+                  AppSpacing.xl,
+                ),
+                sliver: SliverGrid(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: AppLayout.gridColumns(context),
+                    crossAxisSpacing: AppSpacing.gridGap,
+                    mainAxisSpacing: AppSpacing.gridGap,
+                    mainAxisExtent: gridExtent,
+                  ),
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final product = products[index];
+                    return StaggeredEntrance(
+                      index: index,
+                      child: Consumer<FavoritesProvider>(
+                        builder: (context, favorites, _) => ProductCard(
+                          product: product,
+                          isFavorite: favorites.isSaved(product.id),
+                          onTap: () => onProductTap(product),
+                          onFavoriteTap: () =>
+                              _toggleFavorite(context, favorites, product),
+                        ),
+                      ),
+                    );
+                  }, childCount: products.length),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

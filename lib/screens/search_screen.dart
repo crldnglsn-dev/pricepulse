@@ -166,7 +166,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
           ),
           TextButton.icon(
             onPressed: () => _showSortMenu(context),
-            style: TextButton.styleFrom(foregroundColor: AppColors.link),
+            style: TextButton.styleFrom(foregroundColor: AppColors.accent),
             icon: const Icon(Icons.swap_vert_rounded, size: 16),
             label: const Text('Sort'),
           ),
@@ -338,7 +338,7 @@ class _SearchField extends StatelessWidget {
           ),
           focusedBorder: const OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(999)),
-            borderSide: BorderSide(color: AppColors.primary, width: 1.5),
+            borderSide: BorderSide(color: AppColors.accent, width: 1.5),
           ),
         ),
       ),

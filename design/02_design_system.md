@@ -8,66 +8,104 @@
 
 ### 1.1 Color
 
+**Milk & Blush** — a warm, light palette. The app is about soft things
+(prices, favourites, small purchases), so the base is warm paper rather than a
+dark slab, and the accents are rose, lilac and mint.
+
+**The fill / text split.** On a dark theme one colour can serve as both a
+fill and a label. On paper it cannot: a soft rose reads at 2.5:1 as text,
+which is not enough. So each hue has a *fill* and a *text* variant, and the
+text variant is the one that carries a label. `test/theme_contrast_test.dart`
+holds this honest: body text 7:1, captions and small text 4.5:1, UI chrome
+3:1.
+
 **Neutrals (surfaces & borders)**
 
 | Token | Hex | Usage |
 |---|---|---|
-| `bg` | `#121318` | App background |
-| `surface` | `#1C1E26` | Cards, nav bar, fields, sheets |
-| `surfaceElevated` | `#262934` | Hero image wells, sticky footer, pressed cards |
-| `surfaceHover` | `#2C2F3B` | Hover/reveal tint |
-| `border` | `#343743` | Standard 1px borders |
-| `borderSubtle` | `#262934` | Low-emphasis card borders |
-| `scrim` | Black 55% | Modal backdrop |
+| `bg` | `#FFF9F6` | Warm paper — app background, app bar |
+| `surface` | `#FFFFFF` | Cards, nav bar, fields, sheets |
+| `surfaceElevated` | `#FFFCFB` | Chips, dialogs, snackbars |
+| `surfaceHover` | `#F7EFF4` | Pressed wash on a tappable surface |
+| `border` | `#EFE3EA` | Standard 1px borders |
+| `borderSubtle` | `#F7EFF3` | Low-emphasis card borders |
+| `scrim` | `#333E2B36` | Modal backdrop |
 
 **Brand**
 
 | Token | Hex | Usage |
 |---|---|---|
-| `primary` | `#7C4DFF` | Primary buttons, active nav, links, selected chips, focus |
-| `primaryHover` | `#925CFF` | Pressed/hover state of primary |
-| `primaryPressed` | `#6B3BE0` | Ripple/down state |
-| `primaryContainer` | `#2B2145` | Selected chip fill, avatar fill, subtle highlights |
-| `onPrimary` | `#FFFFFF` | Text/icons on primary |
-| `onPrimaryContainer` | `#DECEFF` | Text on primaryContainer |
-| `secondary` | `#E84393` | Accent highlights (promo, "Top picks" tag) |
-| `secondaryContainer` | `#3A2233` | Soft secondary fill |
-| `secondaryTint` | `#FFC2DD` | Text on secondaryContainer |
+| `primary` | `#FF6FA5` | Primary button fill, ripple, selected chip border — **fills only** |
+| `primaryHover` | `#FF87B4` | Hover state of primary |
+| `primaryPressed` | `#E85A8E` | Ripple/down state |
+| `primaryContainer` | `#FFE4EE` | Blush fill — selected chip, avatar, highlights |
+| `onPrimary` | `#4A1F36` | Text/icon **on** `primary` — deep plum, 5.4:1 |
+| `accent` | `#C33D6E` | Brand as **text**, a glyph or a border on a light surface, 4.8:1 |
+| `onPrimaryContainer` | `#8A2450` | Text on `primaryContainer` |
+| `secondary` | `#A78BFA` | Lilac — secondary emphasis |
+| `secondaryContainer` | `#EEE8FF` | Soft lilac fill ("Top pick" badge) |
+| `secondaryTint` | `#4A2E93` | Text on `secondaryContainer` |
+| `tertiary` | `#5ECFB6` | Mint — tertiary emphasis |
 
 **Semantic**
 
 | Token | Hex | Usage |
 |---|---|---|
-| `success` | `#65D98B` | Lowest-price price text, savings badges, "Lowest" pills, savings banner icon |
-| `successContainer` | `#1B3526` | Savings banner / savings chip fill |
-| `onSuccess` | `#0B2E18` | Text on successContainer |
-| `warning` | `#F2A73B` | Outdated-price hint, partial-data notices |
-| `error` | `#FF6B7A` | Validation text, destructive actions, error banners |
-| `errorContainer` | `#3A1F24` | Error toast/banner fill |
-| `link` | `#A98BFF` | Inline text links (brighter than primary for text) |
+| `success` | `#2FA37B` | Lowest-price accents, savings icon — **fills and icons** |
+| `successContainer` | `#DFF5EB` | Savings banner / savings chip fill |
+| `onSuccess` | `#14503A` | Text and icons on `successContainer`, 8.2:1 |
+| `warning` | `#B8780E` | Outdated-price hint, partial-data notices |
+| `error` | `#C2303F` | Validation text, destructive actions, error banners |
+| `errorContainer` | `#FFE3E7` | Error toast/banner fill |
+| `favourite` | `#E8437E` | The filled heart on a photo, 3.8:1 on a near-white scrim |
 
 **Text**
 
 | Token | Hex | Usage |
 |---|---|---|
-| `textPrimary` | `#F5F5F7` | Primary text, prices default |
-| `textSecondary` | `#A5A8B5` | Secondary text, captions |
-| `textMuted` | `#70747F` | Disabled, timestamps, hints |
-| `textDisabled` | `#4A4E5C` | Disabled controls |
+| `textPrimary` | `#2E2733` | Warm charcoal — primary text, prices, 14:1 |
+| `textSecondary` | `#5C5468` | Secondary text, captions, 7.2:1 |
+| `textMuted` | `#6F6679` | Muted text, timestamps, hints, 5.4:1 |
+| `textDisabled` | `#B5ACBD` | Disabled controls |
 
-**Marketplace identification** (store acent dots/badges only — never full-control backgrounds)
+**Depth**
+
+| Token | Hex | Usage |
+|---|---|---|
+| `shadow` | `#1FE86FA8` | The soft shadow under a card — rose-tinted, so it belongs to the palette |
+| `shadowStrong` | `#2EE86FA8` | The one surface that floats above everything |
+
+**Background wash**
+
+| Token | Hex | Usage |
+|---|---|---|
+| `meshBlush` | `#FFD9E6` | Soft gradient blob, top-left |
+| `meshLilac` | `#E4DCFF` | Soft gradient blob, top-right |
+| `meshButter` | `#FFEFCB` | Soft gradient blob, lower-right |
+| `meshMint` | `#D2F3E9` | Soft gradient blob, mid-left |
+
+These are **painted**, not blurred. A live `BackdropFilter` behind a
+scrolling list re-blurs the whole area every frame, which is the most
+expensive thing you can put on a budget phone, and it would only frost the
+app's own content anyway. The wash sits behind the list and never moves.
+
+**Marketplace identification** (store accent dots/badges only — never full-control backgrounds)
 
 | Store | Hex | Rationale |
 |---|---|---|
-| Shopee | `#FF6B52` | Muted orange-red of the Shopee brand |
-| Lazada | `#7E9CFF` | Softened brand blue, readable on `surface` |
-| TikTok Shop | `#3FD8CE` | Brand cyan, readable on `surface` |
+| Shopee | `#E2553A` | Muted orange-red of the Shopee brand, darkened for paper |
+| Lazada | `#4A6FD4` | Softened brand blue, readable on `surface` |
+| TikTok Shop | `#149C93` | Brand teal, readable on `surface` |
 
 Marketplace accents appear as a **colored dot + store name** (and the store monogram glyph); the store name text is always adjacent so color is never the only signal. Full store-colored buttons or brand logos are not used.
 
 ### 1.2 Typography
 
-**Family:** Inter (bundled `assets/fonts/Inter/` — weights 400/500/600/700), system fallback. Inter reads premium and tight in commerce contexts, and it ships as a small asset set (no network needed at demo time).
+**Family:** Nunito (bundled `assets/fonts/Nunito-Variable.ttf` — one variable file covering the 200–1000 weight range), system fallback. Nunito's rounded terminals and open apertures are most of what makes the app read as friendly rather than technical, and its numerals stay legible at price sizes. It ships as a single 270 KB file against Inter's 1.6 MB for the same four weights, so the whole asset payload went **down** by 1.35 MB in the re-skin.
+
+Every style states its weight twice — once as `fontWeight`, for the engine's
+font matching, and once as an explicit `wght` axis variation, so a bold
+heading is bold rather than a slightly-heavier 400.
 
 **Numbers:** every price uses `FontFeature.tabularFigures()` so `₱1,150`, `₱1,299` and `₱1,299.00` stack vertically aligned in the offer list. Prices use `,` thousands separators and `₱` prefix; `:00` decimals only when cents are non-zero.
 
@@ -107,17 +145,23 @@ Grid gap 12 (cards), card padding 14–16, list rows 64dp tall. Vertical rhythm 
 
 | Token | px | Usage |
 |---|---|---|
-| `r-xs` | 8 | Pills, badges, chips |
-| `r-sm` | 12 | Inputs, small cards, buttons |
-| `r-md` | 16 | Product cards, sheets, dialogs, offer rows |
-| `r-lg` | 20 | Hero carousel cards |
+| `r-xs` | 12 | Pills, badges, chips |
+| `r-sm` | 18 | Inputs, small cards, buttons |
+| `r-md` | 24 | Product cards, sheets, dialogs, offer rows |
+| `r-lg` | 30 | Hero carousel cards |
 | `r-pill` | 999 | Search field, ghost buttons, category pills |
 
-Images inside cards crop to the card radius (no double-rounded look).
+Soft and generous. The rounded shape is most of what makes a surface read as
+friendly rather than technical. Images inside cards crop to the card radius
+(no double-rounded look).
 
 ### 1.5 Elevation, borders, iconography, motion
 
-**Borders before shadows.** Cards use 1px `border`/`borderSubtle` strokes on `surface`; elevation is reserved for floating layers (bottom sheets, dialogs, the sticky comparison footer) using `0,2,12` black @ 40% combined with a border. No heavy drop shadows on cards — the dark palette reads depth through tone (`surface → surfaceElevated`).
+**Shadows before borders.** On paper, a hard outline reads as a diagram and a
+soft shadow reads as a card. Cards sit on `surface` with a rose-tinted
+shadow (`shadow`, blur 20, offset 0/8, spread −6) and a hairline
+`borderSubtle` stroke. Floating layers (bottom sheets, dialogs, the sticky
+comparison footer) use `shadowStrong` and no border.
 
 **Icons:** Material Symbols outline style (weight ~1.5), drawn at:
 
@@ -134,9 +178,11 @@ Images inside cards crop to the card radius (no double-rounded look).
 | Moment | Behavior |
 |---|---|
 | Route push (Details, Search) | Slide-up-right 250ms, easeOutCubic; back uses the same inverse (system gesture supported) |
-| Tab switch | Crossfade 200ms |
+| Tab switch | Crossfade 200ms, and the selected nav icon pops 1→1.22→1 on a half-sine over 420ms |
+| Press | Scale to 0.96, easing in; on release it springs back past the resting size and settles (easeOutBack) |
+| Card entrance (Home, Search grids) | Fade + 14dp lift, each card 45ms behind the one before it |
 | Favorite tap | Heart scale pop 1→1.25→1 at 200ms + fill color change |
-| Savings badge appear | Single fade+slide 250ms (once) — deliberate calm, no looping |
+| Savings figure | Counts up from 0 to the recorded saving over 650ms when the details screen opens — it lands on the same number it would show without the animation |
 | Skeleton shimmer | 1s loop, only during loading |
 | Bottom sheet / dialog | Fade + slide 220ms with scrim fade |
 | Snackbar | Auto-in, 4s info / 6s errors, slide-up |
@@ -247,10 +293,10 @@ Card tap target = whole card; visual pressed = `surfaceHover` + scale .98.
 
 ## 3. Accessibility baseline (applied everywhere)
 
-- **Contrast:** body text ≥ 7:1 on surfaces; `body`/`caption` ≥ 4.5:1; large text and UI chrome ≥ 3:1. Tune `#A5A8B5` (secondary text) against `#121318`/`#1C1E26` — if a label falls below 4.5:1 it moves up a token (`textPrimary`).
+- **Contrast:** body text ≥ 7:1 on surfaces; `body`/`caption` ≥ 4.5:1; large text and UI chrome ≥ 3:1. Every text token is checked against the surface it sits on by `test/theme_contrast_test.dart`, so a palette change that breaks a label fails the build rather than shipping.
 - **Touch targets:** ≥ 48×48 for icons and list rows, ≥ 44 minimum; buttons ≥ 48 tall.
 - **Text scaling:** supports Android font scale up to 200% without clipping — prices use `FittedBox`-free layouts with breakpoints; `PriceRangeBar` becomes a simple stat row when constrained.
 - **Color independence:** "Lowest" = green price **+ pill + check icon**; store identity = colored dot **+ name**. Never color alone.
-- **Focus & keyboard:** visible focus rings (primary border on fields/buttons); form flow navigates ✓ next → submit.
+- **Focus & keyboard:** visible focus rings (accent border on fields/buttons); form flow navigates ✓ next → submit.
 - **Reduced motion:** honor `disableAnimations`.
 - **Large screens:** content column capped at 480dp and centered on wide/landscape; grid adapts 2→3 columns ≥ 600dp width.

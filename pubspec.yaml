@@ -66,18 +66,16 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
-  # Inter — bundled so the demo never depends on network access.
+  # Nunito — bundled so the demo never depends on network access.
+  #
+  # A single variable font carrying the whole 200–1000 weight range, rather
+  # than four static files. It is 270 KB against Inter's 1.6 MB for the same
+  # four weights, and the rounded terminals are most of what makes the app
+  # read as friendly rather than technical.
   fonts:
-    - family: Inter
+    - family: Nunito
       fonts:
-        - asset: assets/fonts/Inter-Regular.ttf
-          weight: 400
-        - asset: assets/fonts/Inter-Medium.ttf
-          weight: 500
-        - asset: assets/fonts/Inter-SemiBold.ttf
-          weight: 600
-        - asset: assets/fonts/Inter-Bold.ttf
-          weight: 700
+        - asset: assets/fonts/Nunito-Variable.ttf
 
   assets:
     - assets/products/

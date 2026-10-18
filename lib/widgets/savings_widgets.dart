@@ -15,7 +15,7 @@ class SavingsBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: AppColors.successContainer,
         borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
@@ -26,16 +26,22 @@ class SavingsBadge extends StatelessWidget {
           const Icon(
             Icons.savings_outlined,
             size: 14,
-            color: AppColors.success,
+            color: AppColors.onSuccess,
           ),
-          const SizedBox(width: AppSpacing.xxs),
+          const SizedBox(width: 4),
+          // Scaled down rather than truncated. A badge that reads "Save ..."
+          // says nothing, and a savings figure that loses its last digits is
+          // worse than a smaller one.
           Flexible(
-            child: Text(
-              'Save ${formatPeso(amount)}',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: AppTypography.labelSmall.copyWith(
-                color: AppColors.success,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Save ${formatPeso(amount)}',
+                maxLines: 1,
+                style: AppTypography.labelSmall.copyWith(
+                  color: AppColors.onSuccess,
+                ),
               ),
             ),
           ),
@@ -55,7 +61,7 @@ class LowestPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: AppColors.successContainer,
         borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
@@ -66,16 +72,19 @@ class LowestPill extends StatelessWidget {
           const Icon(
             Icons.check_circle_outline,
             size: 14,
-            color: AppColors.success,
+            color: AppColors.onSuccess,
           ),
-          const SizedBox(width: AppSpacing.xxs),
+          const SizedBox(width: 4),
           Flexible(
-            child: Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: AppTypography.labelSmall.copyWith(
-                color: AppColors.success,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                label,
+                maxLines: 1,
+                style: AppTypography.labelSmall.copyWith(
+                  color: AppColors.onSuccess,
+                ),
               ),
             ),
           ),

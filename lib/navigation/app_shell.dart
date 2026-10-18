@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../screens/account_screen.dart';
@@ -32,24 +34,96 @@ class _AppShellState extends State<AppShell> {
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
         onDestinationSelected: _selectTab,
-        destinations: const [
+        destinations: [
           NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home_rounded),
+            icon: _BounceIcon(icon: Icons.home_outlined, selected: _index == 0),
+            selectedIcon: _BounceIcon(
+              icon: Icons.home_rounded,
+              selected: _index == 0,
+            ),
             label: 'Home',
           ),
           NavigationDestination(
-            icon: Icon(Icons.favorite_border_rounded),
-            selectedIcon: Icon(Icons.favorite_rounded),
+            icon: _BounceIcon(
+              icon: Icons.favorite_border_rounded,
+              selected: _index == 1,
+            ),
+            selectedIcon: _BounceIcon(
+              icon: Icons.favorite_rounded,
+              selected: _index == 1,
+            ),
             label: 'Favorites',
           ),
           NavigationDestination(
-            icon: Icon(Icons.person_outline_rounded),
-            selectedIcon: Icon(Icons.person_rounded),
+            icon: _BounceIcon(
+              icon: Icons.person_outline_rounded,
+              selected: _index == 2,
+            ),
+            selectedIcon: _BounceIcon(
+              icon: Icons.person_rounded,
+              selected: _index == 2,
+            ),
             label: 'Account',
           ),
         ],
       ),
+    );
+  }
+}
+
+/// A nav icon that pops when its tab is selected.
+///
+/// The scale is a transform, not a layout change, so the icon never shifts
+/// its neighbours or resizes the bar.
+class _BounceIcon extends StatefulWidget {
+  const _BounceIcon({required this.icon, required this.selected});
+
+  final IconData icon;
+  final bool selected;
+
+  @override
+  State<_BounceIcon> createState() => _BounceIconState();
+}
+
+class _BounceIconState extends State<_BounceIcon>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 420),
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.selected) _controller.value = 1;
+  }
+
+  @override
+  void didUpdateWidget(_BounceIcon oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.selected && !oldWidget.selected) {
+      _controller.forward(from: 0);
+    } else if (!widget.selected && oldWidget.selected) {
+      _controller.value = 0;
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        // A half sine: up and back down, never past the resting size.
+        final pop = math.sin(math.pi * _controller.value);
+        return Transform.scale(scale: 1 + 0.22 * pop, child: child);
+      },
+      child: Icon(widget.icon),
     );
   }
 }

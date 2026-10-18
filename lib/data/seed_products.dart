@@ -4,6 +4,9 @@
 /// - Prices were read off the live listing pages by driving a real phone, so
 ///   they are real recorded prices, not guesses. They go stale — re-check
 ///   before a demo.
+/// - Each offer carries the date its price was actually read, not one shared
+///   stamp for the whole catalog. Four offers could not be re-confirmed on
+///   2026-10-18 and still say 2026-10-17; see `previouslyCheckedAt`.
 /// - Every URL was opened on the device, not just fetched. Shopee and Lazada
 ///   links land on the product page. TikTok Shop links land on its search
 ///   results with the product as the top "Best match" — reachable in one tap,
@@ -18,13 +21,24 @@ library;
 import '../models/offer.dart';
 import '../models/product.dart';
 
-/// Freshness stamp shared by every offer in this dataset.
-///
-/// 2026-10-18: every URL was opened on a connected phone and the prices
-/// re-read off the listing. Three had drifted and were corrected — Logitech
-/// Shopee 1076 -> 1195, Logitech Lazada 1049 -> 1019, Xiaomi TV Lazada
-/// 9490 -> 9540.
+/// Freshness stamp for offers whose price was re-read off a live listing on
+/// 2026-10-18.
 final DateTime verifiedCheckedAt = DateTime(2026, 10, 18);
+
+/// Freshness stamp for the four offers that could **not** be re-confirmed on
+/// 2026-10-18, so they still carry the date they were actually read.
+///
+/// - The three TikTok Shop prices we could only read were all inside a flash
+///   sale with a live countdown (Orashare 538.53, TV 8630.09, Watch 1826.64).
+///   A flash price is not a durable price, so it is not recorded. The earlier
+///   figures stand, stamped with the date they were really read.
+/// - The Shopee Redmi Watch showed 2064, also inside a flash deal, against a
+///   recorded 2199. The recorded figure stands, stamped with its own date.
+///
+/// The app renders "Recorded `<date>`" per offer, so a caller reading a stale
+/// offer can see that it is staler than the rest rather than being told
+/// everything was checked on the same day.
+final DateTime previouslyCheckedAt = DateTime(2026, 10, 17);
 
 final List<Product> seedProducts = [
   Product(
@@ -82,7 +96,7 @@ final List<Product> seedProducts = [
         store: Store.tiktok,
         price: 588,
         productUrl: 'https://shop.tiktok.com/ph/pdp/1731605640790116113',
-        lastCheckedAt: verifiedCheckedAt,
+        lastCheckedAt: previouslyCheckedAt,
       ),
     ],
   ),
@@ -112,7 +126,7 @@ final List<Product> seedProducts = [
         store: Store.tiktok,
         price: 9013.65,
         productUrl: 'https://shop.tiktok.com/ph/pdp/1729397916647198605',
-        lastCheckedAt: verifiedCheckedAt,
+        lastCheckedAt: previouslyCheckedAt,
       ),
     ],
   ),
@@ -132,7 +146,7 @@ final List<Product> seedProducts = [
             'https://shopee.ph/-Free-Strap-Xiaomi-Redmi-Watch-5-Active-2.0'
             '%27%27-LCD-Display-Bluetooth-Phone-Call-5ATM-Alexa-Built-In-'
             'i.1035296590.27960907170',
-        lastCheckedAt: verifiedCheckedAt,
+        lastCheckedAt: previouslyCheckedAt,
       ),
       Offer(
         store: Store.lazada,
@@ -144,7 +158,7 @@ final List<Product> seedProducts = [
         store: Store.tiktok,
         price: 2041.54,
         productUrl: 'https://shop.tiktok.com/ph/pdp/1729709945974328205',
-        lastCheckedAt: verifiedCheckedAt,
+        lastCheckedAt: previouslyCheckedAt,
       ),
     ],
   ),

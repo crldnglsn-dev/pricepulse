@@ -83,7 +83,47 @@ void main() {
   test('offers carry the verified freshness stamp', () {
     for (final p in products) {
       for (final o in p.offers) {
-        expect(o.lastCheckedAt, verifiedCheckedAt, reason: p.id);
+        expect(
+          o.lastCheckedAt,
+          anyOf(verifiedCheckedAt, previouslyCheckedAt),
+          reason: p.id,
+        );
+        expect(
+          o.lastCheckedAt.isAfter(verifiedCheckedAt),
+          isFalse,
+          reason: '${p.id} is stamped in the future',
+        );
+      }
+    }
+  });
+
+  test('offers that could not be re-confirmed keep their older stamp', () {
+    // These four prices sat inside a flash sale on 2026-10-18, so they were
+    // not re-recorded. Bumping them to the newer stamp would claim a check
+    // that never happened.
+    const unconfirmed = {
+      ('orashare_hs05', Store.tiktok),
+      ('xiaomi_tv_a32', Store.tiktok),
+      ('redmi_watch_5', Store.shopee),
+      ('redmi_watch_5', Store.tiktok),
+    };
+
+    for (final p in products) {
+      for (final o in p.offers) {
+        final key = (p.id, o.store);
+        if (unconfirmed.contains(key)) {
+          expect(
+            o.lastCheckedAt,
+            previouslyCheckedAt,
+            reason: '$key should keep its older stamp',
+          );
+        } else {
+          expect(
+            o.lastCheckedAt,
+            verifiedCheckedAt,
+            reason: '$key was re-read and should carry the newer stamp',
+          );
+        }
       }
     }
   });

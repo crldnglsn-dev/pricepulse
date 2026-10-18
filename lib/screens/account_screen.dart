@@ -10,7 +10,6 @@ import '../theme/app_typography.dart';
 import '../widgets/account_header.dart';
 import '../widgets/feedback.dart';
 import '../widgets/settings_row.dart';
-import '../widgets/status_chip.dart';
 
 /// Account.
 ///
@@ -68,9 +67,12 @@ class AccountScreen extends StatelessWidget {
                 ),
                 SettingsRow(
                   icon: Icons.smartphone_rounded,
-                  title: 'Where favorites are saved',
-                  subtitle: 'Favorites stay on this device.',
-                  trailing: favoriteScopeChip(favorites.scope),
+                  title: 'Where favorites live',
+                  // The Favorites tab carries this as a status chip. Here the
+                  // chip would squeeze the title into an awkward wrap, so the
+                  // same fact is stated in words — and uses the chip's exact
+                  // wording, so the two screens cannot disagree.
+                  subtitle: 'On this device. Not synced to an account.',
                 ),
               ],
             ),
@@ -118,7 +120,7 @@ class AccountScreen extends StatelessWidget {
   static String _countLabel(FavoritesProvider favorites) =>
       favorites.status == FavoritesStatus.loading
       ? '—'
-      : '${favorites.favorites.length}';
+      : '${favorites.favorites.length} saved';
 }
 
 /// Explains that this build has no accounts, instead of pretending otherwise.

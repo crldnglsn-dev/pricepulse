@@ -140,7 +140,7 @@
 │  └─────────────────────────────────────┘  │
 │  ┌ List card ───────────────────────────┐  │
 │  │ ♥  My favorites        (12)      ›   │  │  → Favorites tab (live count)
-│  │ ☁  Where favorites are saved  ●On this device │  StatusChip inline
+│  │ ☁  Where favorites live            │  │  On this device. Not synced.
 │  │ ℹ  App info               v1.0.0  ›  │  │  dialog (version/build/stack)
 │  │ 🔒  Privacy & data             ›    │  │  dialog (honest scope)
 │  └─────────────────────────────────────┘  │
@@ -151,8 +151,8 @@
 ### 4.2 Specs
 
 - Profile header shows `displayName`/`email` from the `AuthUser`; no edit-profile in the prototype (documented out-of-scope, no dead control). Without a display name the email is the heading and is not repeated below it.
-- "My favorites" shows the live count; tap → Favorites tab. While the store is still loading the count is a dash, never `0` — showing zero would claim the answer is known.
-- "Where favorites are saved" carries the same `StatusChip` as the Favorites tab, worded from the same helper so the two screens cannot disagree. It reads **"On this device"** in this build. The spec's original row was called "Sync status"; that name is not used, because there is no sync to report.
+- "My favorites" shows the live count as "N saved"; tap → Favorites tab. While the store is still loading the count is a dash, never `0` — showing zero would claim the answer is known.
+- "Where favorites live" states where favorites are in words: "On this device. Not synced to an account." The Favorites tab carries the same fact as a `StatusChip`. The Account row uses words rather than the chip because the chip is wide enough to squeeze the title into an awkward wrap on a phone; the wording is the chip's exact wording, so the two screens cannot disagree. The spec's original row was called "Sync status"; that name is not used, because there is no sync to report.
 - The trailing chip and the row label are both flexible, so the row survives a 200% text scale on a 320dp phone.
 - "App info" dialog: PricePulse 1.0.0 (build 1) · Flutter · local device storage · "Built as an academic prototype".
 - "Log out": shown only when signed in. Dialog "Log out of PricePulse?" — `TextButton` "Cancel" + destructive "Log out". After: session cleared, snackbar "You've been logged out."

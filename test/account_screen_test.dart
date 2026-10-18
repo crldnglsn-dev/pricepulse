@@ -80,7 +80,8 @@ void main() {
       await pumpAccount(tester);
 
       expect(find.text('Synced'), findsNothing);
-      expect(find.text('On this device'), findsOneWidget);
+      expect(find.textContaining('On this device'), findsOneWidget);
+      expect(find.textContaining('Not synced to an account'), findsOneWidget);
     });
 
     testWidgets('says plainly that accounts are not part of this build', (
@@ -156,7 +157,7 @@ void main() {
 
       await pumpAccount(tester, favorites: repo);
 
-      expect(find.text('2'), findsOneWidget);
+      expect(find.text('2 saved'), findsOneWidget);
     });
 
     testWidgets('tapping My favorites opens the Favorites tab', (tester) async {

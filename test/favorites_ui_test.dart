@@ -101,7 +101,7 @@ void main() {
       final saved = (await repo.watchFavorites().first).single;
       expect(saved.name, 'Logitech G102 LIGHTSYNC Gaming Mouse');
       expect(saved.imageUrl, 'assets/products/logitech_g102.png');
-      expect(saved.lastKnownPrice, 1049);
+      expect(saved.lastKnownPrice, 1019);
       expect(saved.lastKnownStore, 'Lazada');
     });
 

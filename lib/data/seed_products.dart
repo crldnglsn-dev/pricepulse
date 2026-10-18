@@ -1,11 +1,13 @@
 /// SEED DATA — five hand-curated products, each with the same brand, model and
 /// variant sold across Shopee, Lazada and TikTok Shop.
 ///
-/// - Prices were read off the live listing pages on 2026-10-17, so they are
-///   real recorded prices, not guesses. They go stale — re-check before a demo.
-/// - URLs were checked with `dart run tool/verify_links.dart`. Only Lazada
-///   returns a real 404 for a missing listing, so Shopee and TikTok Shop links
-///   are reachable but **unproven** until opened on a device.
+/// - Prices were read off the live listing pages by driving a real phone, so
+///   they are real recorded prices, not guesses. They go stale — re-check
+///   before a demo.
+/// - Every URL was opened on the device, not just fetched. Shopee and Lazada
+///   links land on the product page. TikTok Shop links land on its search
+///   results with the product as the top "Best match" — reachable in one tap,
+///   but not a direct product page. See the `_t` note below.
 /// - `logitech_g102` has no TikTok offer on purpose: that row renders the
 ///   designed "no recorded offer yet" state.
 /// - `bench_pomade_20g` is `comparable: false` — its Lazada listing sells both
@@ -17,7 +19,12 @@ import '../models/offer.dart';
 import '../models/product.dart';
 
 /// Freshness stamp shared by every offer in this dataset.
-final DateTime verifiedCheckedAt = DateTime(2026, 10, 17);
+///
+/// 2026-10-18: every URL was opened on a connected phone and the prices
+/// re-read off the listing. Three had drifted and were corrected — Logitech
+/// Shopee 1076 -> 1195, Logitech Lazada 1049 -> 1019, Xiaomi TV Lazada
+/// 9490 -> 9540.
+final DateTime verifiedCheckedAt = DateTime(2026, 10, 18);
 
 final List<Product> seedProducts = [
   Product(
@@ -34,13 +41,13 @@ final List<Product> seedProducts = [
     offers: [
       Offer(
         store: Store.shopee,
-        price: 1076,
+        price: 1195,
         productUrl: 'https://shopee.ph/product/124930893/9544986414',
         lastCheckedAt: verifiedCheckedAt,
       ),
       Offer(
         store: Store.lazada,
-        price: 1049,
+        price: 1019,
         productUrl:
             'https://www.lazada.com.ph/products/i1059718604-s3599640767.html',
         lastCheckedAt: verifiedCheckedAt,
@@ -97,7 +104,7 @@ final List<Product> seedProducts = [
       ),
       Offer(
         store: Store.lazada,
-        price: 9490,
+        price: 9540,
         productUrl: 'https://www.lazada.com.ph/products/pdp-i4573619650-s26308659225.html',
         lastCheckedAt: verifiedCheckedAt,
       ),
